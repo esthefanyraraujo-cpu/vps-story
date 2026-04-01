@@ -26,16 +26,17 @@ export async function criarServidor(
   tipo: string,
   imagem: string = DEFAULT_IMAGE
 ): Promise<{ server: HetznerServer; rootPassword: string }> {
+  const body = {
+    name: nome,
+    server_type: tipo,
+    image: imagem,
+    start_after_create: true,
+  }
+  console.log(`[HETZNER] Request Body:`, JSON.stringify(body))
   const res = await fetch(`${HETZNER_BASE}/servers`, {
     method: 'POST',
     headers: getHeaders(),
-    body: JSON.stringify({
-      name: nome,
-      server_type: tipo,
-      image: imagem,
-      location: DEFAULT_LOCATION,
-      start_after_create: true,
-    }),
+    body: JSON.stringify(body),
   })
 
   if (!res.ok) {
