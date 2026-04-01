@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CLIENT
+  ADMIN
+}
+
+enum VPSStatus {
+  ATIVO
+  SUSPENSO
+  CANCELADO
+}
+
+enum PagamentoStatus {
+  PENDENTE
+  PAGO
+  FALHOU
+}
+
+enum Gateway {
+  MP
+  STRIPE
+  PAGSEGURO
+}
+
+enum TicketStatus {
+  ABERTO
+  RESPONDIDO
+  FECHADO
+}
+
+enum Prioridade {
+  BAIXA
+  MEDIA
+  ALTA
+}
+
+model User {
+  id        String   @id @default(cuid())
+  nome      String
+  email     String   @unique
+  senha     String
+  role      Role     @default(CLIENT)
+  createdAt DateTime @default(now())
+
+  vps        VPS[]
+  pagamentos Pagamento[]
+  tickets    Ticket[]
+  mensagens  TicketMensagem[]
+
+  @@map("users")
+}
+
+model Plano {
+  id           String   @id @default(cuid())
+  nome         String
+  descricao    String?
+  ram          Int
+  cpu          Int
+  ssd          Int
+  banda        Int
+  precoMensal  Decimal  @db.Decimal(10, 2)
+  hetznerTipo  String
+  ativo        Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  vps        VPS[]
+  pagamentos Pagamento[]
+
+  @@map("planos")
+}
+
+model VPS {
+  id                   String    @id @default(cuid())
+  userId               String
+  planoId              String
+  hetznerServerId      Int
+  nome                 String
+  ip                   String?
+  rootPasswordEncrypted String?
+  status               VPSStatus @default(ATIVO)
+  dataExpiracao        DateTime
+  createdAt            DateTime  @default(now())
+
+  user       User        @relation(fields: [userId], references: [id])
+  plano      Plano       @relation(fields: [planoId], references: [id])
+  pagamentos Pagamento[]
+
+  @@map("vps")
+}
+
+model Pagamento {
+  id           String          @id @default(cuid())
+  userId       String
+  vpsId        String?
+  planoId      String
+  valor        Decimal         @db.Decimal(10, 2)
+  gateway      Gateway
+  status       PagamentoStatus @default(PENDENTE)
+  transacaoId  String?         @unique
+  createdAt    DateTime        @default(now())
+
+  user  User   @relation(fields: [userId], references: [id])
+  vps   VPS?   @relation(fields: [vpsId], references: [id])
+  plano Plano  @relation(fields: [planoId], references: [id])
+
+  @@map("pagamentos")
+}
+
+model Ticket {
+  id        String       @id @default(cuid())
+  userId    String
+  titulo    String
+  status    TicketStatus @default(ABERTO)
+  prioridade Prioridade  @default(MEDIA)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  user      User             @relation(fields: [userId], references: [id])
+  mensagens TicketMensagem[]
+
+  @@map("tickets")
+}
+
+model TicketMensagem {
+  id        String   @id @default(cuid())
+  ticketId  String
+  autorId   String
+  mensagem  String   @db.Text
+  createdAt DateTime @default(now())
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  autor  User   @relation(fields: [autorId], references: [id])
+
+  @@map("ticket_mensagens")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("password_reset_tokens")
+}
