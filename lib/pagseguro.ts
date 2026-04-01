@@ -1,6 +1,6 @@
 interface PlanoInfo {
   nome: string
-  precoMensal: number | string
+  precoMensal: number | string | any
 }
 
 export async function criarOrdemPagSeguro(
