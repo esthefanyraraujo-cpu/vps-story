@@ -38,7 +38,7 @@ export async function criarPreferencia(
         failure: `${appUrl}/checkout?pagamento=falhou`,
         pending: `${appUrl}/dashboard?pagamento=pendente`,
       },
-      auto_approve: true,
+      auto_return: 'approved',
       notification_url: `${appUrl}/api/webhooks/mercadopago`,
     },
   })
