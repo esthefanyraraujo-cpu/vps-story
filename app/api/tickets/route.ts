@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma'
 import { ticketSchema } from '@/lib/validations'
 import { NextRequest, NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   try {
     const session = await auth()
