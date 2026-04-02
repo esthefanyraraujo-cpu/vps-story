@@ -46,9 +46,17 @@ export default async function AdminTestarPlanosPage() {
             </div>
 
             <div className="pt-4 border-t space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500 font-medium">Preco Real:</span>
-                <span className="text-lg font-bold text-purple-600">{formatarMoeda(plano.precoMensal)}</span>
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center justify-between text-xs text-gray-400 line-through">
+                  <span>Preco Real:</span>
+                  <span>{formatarMoeda(plano.precoMensal)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-gray-700">Preco Admin (99% OFF):</span>
+                  <span className="text-xl font-black text-green-600">
+                    {formatarMoeda(Number(plano.precoMensal) * 0.01)}
+                  </span>
+                </div>
               </div>
               
               <CriarVPSManual 
