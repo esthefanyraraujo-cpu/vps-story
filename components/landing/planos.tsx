@@ -51,7 +51,7 @@ export async function LandingPlanos() {
                 <ul className="space-y-2.5 mb-8 flex-1 text-sm text-gray-700">
                   <li className="flex items-center gap-2">
                     <span className="text-green-500">✓</span>
-                    {plano.ram >= 1024 ? `${plano.ram / 1024} GB` : `${plano.ram} MB`} RAM
+                    {plano.ram} GB RAM
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-green-500">✓</span>

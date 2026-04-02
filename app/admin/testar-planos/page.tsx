@@ -38,7 +38,7 @@ export default async function AdminTestarPlanosPage() {
             <div className="space-y-2 mb-6 flex-1">
               <p className="text-sm text-gray-600">{plano.descricao}</p>
               <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 pt-2">
-                <p>RAM: {plano.ram >= 1024 ? `${plano.ram/1024}GB` : `${plano.ram}MB`}</p>
+                <p>RAM: {plano.ram}GB</p>
                 <p>CPU: {plano.cpu} vCPUs</p>
                 <p>SSD: {plano.ssd}GB</p>
                 <p>Tipo: {plano.hetznerTipo}</p>
@@ -51,7 +51,12 @@ export default async function AdminTestarPlanosPage() {
                 <span className="text-lg font-bold text-purple-600">{formatarMoeda(plano.precoMensal)}</span>
               </div>
               
-              <CriarVPSManual userId={session.user.id} userName="Sua Conta (Admin)" />
+              <CriarVPSManual 
+                userId={session.user.id} 
+                userName="Sua Conta (Admin)" 
+                planoId={plano.id}
+                planoNome={plano.nome}
+              />
             </div>
           </div>
         ))}

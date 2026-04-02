@@ -11,25 +11,28 @@ interface Plano {
 interface Props {
   userId: string
   userName: string
+  planoId?: string // Opcional: se fornecido, pula a selecao
+  planoNome?: string
 }
 
-export function CriarVPSManual({ userId, userName }: Props) {
+export function CriarVPSManual({ userId, userName, planoId: defaultPlanoId, planoNome }: Props) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [planos, setPlanos] = useState<Plano[]>([])
-  const [planoId, setPlanoId] = useState<string>('')
+  const [planoId, setPlanoId] = useState<string>(defaultPlanoId || '')
 
   useEffect(() => {
-    if (open) {
+    if (open && !defaultPlanoId) {
       fetch('/api/public/planos')
         .then((res) => res.json())
         .then((data) => setPlanos(data))
         .catch(() => alert('Erro ao carregar planos'))
     }
-  }, [open])
+  }, [open, defaultPlanoId])
 
   async function handleCriar() {
-    if (!planoId) return
+    const finalPlanoId = defaultPlanoId || planoId
+    if (!finalPlanoId) return
 
     setLoading(true)
     try {
@@ -70,29 +73,37 @@ export function CriarVPSManual({ userId, userName }: Props) {
             </div>
             
             <div className="p-6 space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 block">Selecione o Plano</label>
-                <select
-                  className="w-full p-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
-                  value={planoId}
-                  onChange={(e) => setPlanoId(e.target.value)}
-                >
-                  <option value="">Escolha um plano...</option>
-                  {planos.map((plano) => (
-                    <option key={plano.id} value={plano.id}>
-                      {plano.nome}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {!defaultPlanoId ? (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700 block">Selecione o Plano</label>
+                  <select
+                    className="w-full p-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
+                    value={planoId}
+                    onChange={(e) => setPlanoId(e.target.value)}
+                  >
+                    <option value="">Escolha um plano...</option>
+                    {planos.map((plano) => (
+                      <option key={plano.id} value={plano.id}>
+                        {plano.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
+                  <p className="text-sm text-purple-900">
+                    Você está prestes a criar uma VPS do plano <strong>{planoNome}</strong> para <strong>{userName}</strong>.
+                  </p>
+                </div>
+              )}
 
               <button
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                disabled={!planoId || loading}
+                disabled={(!defaultPlanoId && !planoId) || loading}
                 onClick={handleCriar}
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                {loading ? 'Provisionando...' : 'Provisionar Agora na Hetzner'}
+                {loading ? 'Provisionando...' : 'Confirmar e Provisionar Agora'}
               </button>
             </div>
           </div>
