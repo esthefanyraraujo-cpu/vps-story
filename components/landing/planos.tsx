@@ -74,13 +74,12 @@ export async function LandingPlanos() {
                 <Link
                   href={`/checkout/${plano.id}`}
                   className={`block text-center py-3 rounded-xl font-semibold transition-colors ${
-                    isTestPlan ? 'bg-yellow-600 hover:bg-yellow-700 text-white' :
                     i === 1
                       ? 'bg-purple-600 hover:bg-purple-700 text-white'
                       : 'bg-gray-100 hover:bg-purple-600 hover:text-white text-gray-900'
                   }`}
                 >
-                  {isTestPlan ? 'Iniciar Teste' : 'Contratar Agora'}
+                  Contratar Agora
                 </Link>
               </div>
             )
