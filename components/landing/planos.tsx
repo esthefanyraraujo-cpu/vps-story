@@ -3,22 +3,15 @@ import { formatarMoeda } from '@/lib/utils'
 import Link from 'next/link'
 import { auth } from '@/lib/auth'
 
-async function getPlanos(isAdmin: boolean) {
+async function getPlanos() {
   return prisma.plano.findMany({
-    where: {
-      OR: [
-        { ativo: true },
-        isAdmin ? { nome: 'VPS Teste Admin' } : {}
-      ]
-    },
+    where: { ativo: true },
     orderBy: { precoMensal: 'asc' },
   })
 }
 
 export async function LandingPlanos() {
-  const session = await auth()
-  const isAdmin = session?.user?.role === 'ADMIN'
-  const planos = await getPlanos(isAdmin)
+  const planos = await getPlanos()
 
   return (
     <section id="planos" className="py-20 bg-gray-50 px-4">
@@ -30,28 +23,16 @@ export async function LandingPlanos() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {planos.map((plano, i) => {
-            const isTestPlan = plano.nome === 'VPS Teste Admin'
-            const precoExibido = isAdmin 
-              ? Number(plano.precoMensal) * 0.01 
-              : Number(plano.precoMensal)
+            const precoExibido = Number(plano.precoMensal)
 
             return (
               <div
                 key={plano.id}
                 className={`bg-white rounded-2xl shadow-sm p-8 border-2 flex flex-col ${
-                  isTestPlan ? 'border-yellow-500 bg-yellow-50/30' : 
                   i === 1 ? 'border-purple-500 shadow-purple-100 shadow-lg' : 'border-transparent'
                 }`}
               >
-                {isTestPlan && (
-                  <div className="text-center mb-3">
-                    <span className="bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                      PLANO DE TESTE (ADMIN)
-                    </span>
-                  </div>
-                )}
-                
-                {i === 1 && !isTestPlan && (
+                {i === 1 && (
                   <div className="text-center mb-3">
                     <span className="bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                       MAIS POPULAR
@@ -65,9 +46,6 @@ export async function LandingPlanos() {
                 <div className="mb-6">
                   <span className="text-4xl font-bold text-purple-600">{formatarMoeda(precoExibido)}</span>
                   <span className="text-gray-500 text-sm">/mes</span>
-                  {isAdmin && (
-                    <p className="text-xs text-gray-400 line-through">De {formatarMoeda(plano.precoMensal)}</p>
-                  )}
                 </div>
 
                 <ul className="space-y-2.5 mb-8 flex-1 text-sm text-gray-700">

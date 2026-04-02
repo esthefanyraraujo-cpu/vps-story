@@ -25,23 +25,9 @@ export async function POST(req: NextRequest) {
 
     const { planoId, gateway, cpf } = result.data
 
-    const plano = await prisma.plano.findUnique({ where: { id: planoId } })
+    const plano = await prisma.plano.findUnique({ where: { id: planoId, ativo: true } })
     if (!plano) {
       return NextResponse.json({ error: 'Plano nao encontrado' }, { status: 404 })
-    }
-
-    // Se o plano nao estiver ativo, so permite se for o plano de teste e o usuario for admin
-    if (!plano.ativo && !(plano.nome === 'VPS Teste Admin' && session.user.role === 'ADMIN')) {
-      return NextResponse.json({ error: 'Plano nao disponivel' }, { status: 403 })
-    }
-
-    // Aplicar desconto de 99% para administradores em QUALQUER plano
-    let valorFinal = Number(plano.precoMensal)
-    const isAdmin = session.user.role === 'ADMIN'
-    
-    if (isAdmin) {
-      valorFinal = valorFinal * 0.01 // 99% de desconto em qualquer plano para o admin
-      console.log(`[CHECKOUT] Aplicando desconto de Admin: R$ ${valorFinal} no plano ${plano.nome}`)
     }
 
     // Criar registro de pagamento pendente
@@ -49,7 +35,7 @@ export async function POST(req: NextRequest) {
       data: {
         userId: session.user.id,
         planoId,
-        valor: valorFinal,
+        valor: plano.precoMensal,
         gateway,
         status: 'PENDENTE',
       },
@@ -59,18 +45,12 @@ export async function POST(req: NextRequest) {
 
     if (gateway === 'MP') {
       redirectUrl = await criarPreferencia(
-        { 
-          nome: isAdmin ? `${plano.nome} (Admin Teste)` : plano.nome, 
-          precoMensal: valorFinal 
-        },
+        { nome: plano.nome, precoMensal: plano.precoMensal },
         pagamento.id
       )
     } else if (gateway === 'STRIPE') {
       redirectUrl = await criarCheckoutSession(
-        { 
-          nome: isAdmin ? `${plano.nome} (Admin Teste)` : plano.nome, 
-          precoMensal: valorFinal 
-        },
+        { nome: plano.nome, precoMensal: plano.precoMensal },
         pagamento.id
       )
     } else if (gateway === 'PAGSEGURO') {
@@ -78,10 +58,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'CPF e obrigatorio para PagSeguro' }, { status: 400 })
       }
       redirectUrl = await criarOrdemPagSeguro(
-        { 
-          nome: isAdmin ? `${plano.nome} (Admin Teste)` : plano.nome, 
-          precoMensal: valorFinal 
-        },
+        { nome: plano.nome, precoMensal: plano.precoMensal },
         pagamento.id,
         cpf
       )

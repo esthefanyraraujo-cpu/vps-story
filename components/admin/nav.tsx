@@ -10,6 +10,7 @@ const navItems = [
   { href: '/admin/vps', label: 'VPS' },
   { href: '/admin/tickets', label: 'Tickets' },
   { href: '/admin/planos', label: 'Planos' },
+  { href: '/admin/testar-planos', label: 'Modo Teste' },
 ]
 
 export function AdminNav() {
