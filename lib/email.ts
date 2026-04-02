@@ -16,6 +16,7 @@ export async function enviarCredenciaisVPS(
   nomeVPS: string
 ): Promise<void> {
   const resend = getResend()
+  const isWindows = nomeVPS.toLowerCase().includes('windows') || email.includes('windows') // Heuristica simples
 
   await resend.emails.send({
     from: FROM,
@@ -29,13 +30,20 @@ export async function enviarCredenciaisVPS(
         <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
           <p><strong>Nome do servidor:</strong> ${nomeVPS}</p>
           <p><strong>IP:</strong> <code style="background: #e5e7eb; padding: 2px 6px; border-radius: 4px;">${ip}</code></p>
-          <p><strong>Usuario:</strong> <code style="background: #e5e7eb; padding: 2px 6px; border-radius: 4px;">root</code></p>
+          <p><strong>Usuario:</strong> <code style="background: #e5e7eb; padding: 2px 6px; border-radius: 4px;">${isWindows ? 'Administrator' : 'root'}</code></p>
           <p><strong>Senha:</strong> <code style="background: #e5e7eb; padding: 2px 6px; border-radius: 4px;">${senha}</code></p>
         </div>
-        <p><strong>Como conectar (SSH):</strong></p>
-        <code style="background: #1f2937; color: #10b981; padding: 10px; display: block; border-radius: 4px;">
-          ssh root@${ip}
-        </code>
+        ${isWindows ? `
+          <p><strong>Como conectar (Area de Trabalho Remota):</strong></p>
+          <p>1. Abra o programa "Conexao de Area de Trabalho Remota" no seu Windows.</p>
+          <p>2. Digite o IP: <strong>${ip}</strong></p>
+          <p>3. Use o usuario: <strong>Administrator</strong></p>
+        ` : `
+          <p><strong>Como conectar (SSH):</strong></p>
+          <code style="background: #1f2937; color: #10b981; padding: 10px; display: block; border-radius: 4px;">
+            ssh root@${ip}
+          </code>
+        `}
         <p style="color: #ef4444; margin-top: 20px;">Por seguranca, altere sua senha apos o primeiro acesso!</p>
         <p>Acesse seu painel em: <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard">Meu Painel</a></p>
       </div>
@@ -49,7 +57,7 @@ export async function enviarRecuperacaoSenha(
   token: string
 ): Promise<void> {
   const resend = getResend()
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://vps-story.vercel.app'
   const link = `${appUrl}/redefinir-senha/${token}`
 
   await resend.emails.send({
@@ -77,7 +85,7 @@ export async function enviarNotificacaoTicket(
   tituloTicket: string
 ): Promise<void> {
   const resend = getResend()
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://vps-story.vercel.app'
 
   await resend.emails.send({
     from: FROM,

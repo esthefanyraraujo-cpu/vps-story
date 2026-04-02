@@ -32,6 +32,8 @@ export default async function VPSDetailPage({ params }: Props) {
     CANCELADO: 'bg-red-100 text-red-800',
   }
 
+  const isWindows = vps.plano.nome.toLowerCase().includes('windows')
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -71,17 +73,42 @@ export default async function VPSDetailPage({ params }: Props) {
         </div>
       </div>
 
-      {/* SSH Info */}
+      {/* Connection Info */}
       <div className="bg-white rounded-xl border p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Acesso SSH</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          {isWindows ? 'Acesso Area de Trabalho Remota (RDP)' : 'Acesso SSH'}
+        </h2>
         {vps.ip ? (
           <div className="space-y-3">
-            <div className="bg-gray-900 text-green-400 rounded-lg p-4 font-mono text-sm">
-              ssh root@{vps.ip}
-            </div>
-            <p className="text-sm text-gray-500">
-              Usuario: <code className="bg-gray-100 px-1.5 py-0.5 rounded">root</code>
-            </p>
+            {isWindows ? (
+              <>
+                <div className="bg-gray-100 p-4 rounded-lg">
+                  <p className="text-sm text-gray-700">
+                    Use o programa <strong>Conexao de Area de Trabalho Remota</strong> do Windows.
+                  </p>
+                  <p className="text-sm text-gray-700 mt-2">
+                    Computador: <code className="bg-white px-1.5 py-0.5 rounded border">{vps.ip}</code>
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <p className="text-sm text-gray-500">
+                    Usuario: <code className="bg-gray-100 px-1.5 py-0.5 rounded font-mono">Administrator</code>
+                  </p>
+                  <p className="text-sm text-gray-500 text-xs italic">
+                    * A senha foi enviada para o seu e-mail.
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="bg-gray-900 text-green-400 rounded-lg p-4 font-mono text-sm">
+                  ssh root@{vps.ip}
+                </div>
+                <p className="text-sm text-gray-500">
+                  Usuario: <code className="bg-gray-100 px-1.5 py-0.5 rounded">root</code>
+                </p>
+              </>
+            )}
           </div>
         ) : (
           <p className="text-gray-500">IP sendo configurado, aguarde alguns minutos...</p>

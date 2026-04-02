@@ -13,7 +13,7 @@ export async function criarOrdemPagSeguro(
 
   if (!token) throw new Error('PAGSEGURO_TOKEN nao definido')
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://vps-story.vercel.app'
 
   const res = await fetch(`${baseUrl}/orders`, {
     method: 'POST',

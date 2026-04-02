@@ -18,10 +18,12 @@ async function main() {
     return
   }
 
-  // 2. Buscar o primeiro plano disponivel (VPS Starter)
-  const plano = await prisma.plano.findFirst()
+  // 2. Buscar o plano VPS Gamer
+  const plano = await prisma.plano.findFirst({
+    where: { nome: 'VPS Gamer' }
+  })
   if (!plano) {
-    console.error('Erro: Nenhum plano encontrado no banco.')
+    console.error('Erro: Plano VPS Gamer nao encontrado no banco.')
     return
   }
 

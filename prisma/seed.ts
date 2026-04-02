@@ -20,11 +20,12 @@ async function main() {
   })
   console.log('Admin criado:', admin.email)
 
-  // Criar planos
+  // Criar planos Linux e Windows
   const planos = [
+    // Planos Linux
     {
-      nome: 'VPS Starter',
-      descricao: 'Ideal para projetos pequenos e aprendizado',
+      nome: 'Linux Starter',
+      descricao: 'Ideal para sites leves e aprendizado',
       ram: 2,
       cpu: 2,
       ssd: 40,
@@ -34,8 +35,8 @@ async function main() {
       ativo: true,
     },
     {
-      nome: 'VPS Pro',
-      descricao: 'Para aplicações em produção e pequenas empresas',
+      nome: 'Linux Pro',
+      descricao: 'Para aplicacoes em producao e empresas',
       ram: 4,
       cpu: 2,
       ssd: 80,
@@ -45,8 +46,8 @@ async function main() {
       ativo: true,
     },
     {
-      nome: 'VPS Gamer',
-      descricao: 'Servidores de jogos e aplicações de alto desempenho',
+      nome: 'Linux Gamer',
+      descricao: 'Servidores de jogos e alta performance',
       ram: 8,
       cpu: 4,
       ssd: 160,
@@ -54,6 +55,51 @@ async function main() {
       precoMensal: 99.90,
       hetznerTipo: 'cx43',
       ativo: true,
+    },
+    // Planos Windows
+    {
+      nome: 'Windows Starter',
+      descricao: 'Basico para desktop remoto Windows',
+      ram: 4,
+      cpu: 2,
+      ssd: 80,
+      banda: 20,
+      precoMensal: 64.90,
+      hetznerTipo: 'cx33',
+      ativo: true,
+    },
+    {
+      nome: 'Windows Pro',
+      descricao: 'Ideal para aplicacoes e desktop fluido',
+      ram: 8,
+      cpu: 4,
+      ssd: 160,
+      banda: 20,
+      precoMensal: 94.90,
+      hetznerTipo: 'cx43',
+      ativo: true,
+    },
+    {
+      nome: 'Windows Ultra (FiveM)',
+      descricao: 'Alta performance para FiveM e servidores pesados',
+      ram: 16,
+      cpu: 8,
+      ssd: 320,
+      banda: 20,
+      precoMensal: 179.90,
+      hetznerTipo: 'cx53',
+      ativo: true,
+    },
+    {
+      nome: 'VPS Teste Admin',
+      descricao: 'Plano exclusivo para testes do administrador',
+      ram: 4,
+      cpu: 2,
+      ssd: 40,
+      banda: 20,
+      precoMensal: 1.00,
+      hetznerTipo: 'cx23',
+      ativo: false, // Desativado por padrao para nao aparecer para clientes
     },
   ]
 

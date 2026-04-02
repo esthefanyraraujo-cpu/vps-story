@@ -24,13 +24,17 @@ export interface HetznerServer {
 export async function criarServidor(
   nome: string,
   tipo: string,
-  imagem: string = DEFAULT_IMAGE
+  imagem: string = DEFAULT_IMAGE,
+  userData?: string
 ): Promise<{ server: HetznerServer; rootPassword: string }> {
-  const body = {
+  const body: any = {
     name: nome,
     server_type: tipo,
     image: imagem,
     start_after_create: true,
+  }
+  if (userData) {
+    body.user_data = userData
   }
   console.log(`[HETZNER] Request Body:`, JSON.stringify(body))
   const res = await fetch(`${HETZNER_BASE}/servers`, {

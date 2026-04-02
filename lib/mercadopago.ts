@@ -19,7 +19,7 @@ export async function criarPreferencia(
   const client = getClient()
   const preference = new Preference(client)
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://vps-story.vercel.app'
 
   const result = await preference.create({
     body: {

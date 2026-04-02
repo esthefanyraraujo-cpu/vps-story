@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { formatarData, formatarMoeda, diasAteExpirar } from '@/lib/utils'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { CriarVPSManual } from '@/components/admin/criar-vps-manual'
 
 async function getDashboardData(userId: string) {
   const [vpsServers, pagamentos, tickets] = await Promise.all([
@@ -30,6 +31,7 @@ export default async function DashboardPage() {
   const session = await auth()
   if (!session?.user) redirect('/login')
 
+  const isAdmin = session.user.role === 'ADMIN'
   const { vpsServers, pagamentos, tickets } = await getDashboardData(session.user.id)
 
   const statusColor: Record<string, string> = {
@@ -77,12 +79,17 @@ export default async function DashboardPage() {
       <div className="bg-white rounded-xl border">
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-lg font-semibold text-gray-900">Meus Servidores VPS</h2>
-          <Link
-            href="/planos"
-            className="text-sm bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
-          >
-            Contratar VPS
-          </Link>
+          <div className="flex items-center gap-3">
+            {isAdmin && (
+              <CriarVPSManual userId={session.user.id} userName={session.user.name || 'Admin'} />
+            )}
+            <Link
+              href="/planos"
+              className="text-sm bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              Contratar VPS
+            </Link>
+          </div>
         </div>
 
         {vpsServers.length === 0 ? (

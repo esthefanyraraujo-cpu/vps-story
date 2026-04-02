@@ -16,7 +16,7 @@ export async function criarCheckoutSession(
   pagamentoId: string
 ): Promise<string> {
   const stripe = getStripe()
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://vps-story.vercel.app'
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
