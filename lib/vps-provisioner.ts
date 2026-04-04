@@ -30,13 +30,10 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
   // ID do Snapshot da Imagem Mestra
   const WINDOWS_SNAPSHOT_ID = '373331653'
 
-  // Script para trocar a senha do Windows no primeiro boot (Cloud-Init)
-  const windowsUserData = isWindows ? `#cloud-config
-password: ${novaSenhaAleatoria}
-chpasswd: { expire: False }
-ssh_pwauth: True
-runcmd:
-  - [ net, user, Administrator, "${novaSenhaAleatoria}" ]
+  // Script para trocar a senha do Windows no primeiro boot (Cloud-Init / Cloudbase-Init)
+  // Usando formato PowerShell (#ps1_sysnative) que e mais nativo para Windows
+  const windowsUserData = isWindows ? `#ps1_sysnative
+net user Administrator "${novaSenhaAleatoria}"
 ` : undefined
 
   const imagemBase = isWindows ? WINDOWS_SNAPSHOT_ID : 'ubuntu-22.04'
