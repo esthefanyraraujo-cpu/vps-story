@@ -136,6 +136,28 @@ export default async function VPSDetailPage({ params }: Props) {
         <VPSActions vpsId={vps.id} status={vps.status} />
       </div>
 
+      {isWindows && (
+        <div className="bg-purple-50 border border-purple-100 rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-purple-900 mb-4 flex items-center gap-2">
+            🚀 O que fazer enquanto espera?
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <h3 className="text-sm font-bold text-purple-800 uppercase tracking-wider">Passo 1: FiveM Keymaster</h3>
+              <p className="text-sm text-purple-700">
+                Acesse o <a href="https://keymaster.fivem.net/" target="_blank" className="underline font-bold">Keymaster</a> e gere sua License Key usando o IP <strong>{vps.ip}</strong>. Sem ela, seu servidor não aparecerá na lista pública.
+              </p>
+            </div>
+            <div className="space-y-3">
+              <h3 className="text-sm font-bold text-purple-800 uppercase tracking-wider">Passo 2: Preparar Base</h3>
+              <p className="text-sm text-purple-700">
+                Certifique-se de que sua base (vRP, ESX, etc) está atualizada e pronta para ser enviada via FileZilla assim que o acesso for liberado.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Dados do Plano */}
       <div className="bg-white rounded-xl border p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Configuracoes</h2>
