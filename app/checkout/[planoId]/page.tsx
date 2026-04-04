@@ -22,6 +22,10 @@ export default async function CheckoutPage({ params }: Props) {
   const plano = await getPlano(params.planoId)
   if (!plano) redirect('/planos')
 
+  const isAdmin = session?.user?.role === 'ADMIN'
+  const precoOriginal = Number(plano.precoMensal)
+  const precoFinal = isAdmin ? precoOriginal * 0.01 : precoOriginal
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-2xl mx-auto px-4">
@@ -34,7 +38,14 @@ export default async function CheckoutPage({ params }: Props) {
         <div className="grid gap-6">
           {/* Resumo do plano */}
           <div className="bg-white rounded-xl border p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Resumo do Pedido</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">Resumo do Pedido</h2>
+              {isAdmin && (
+                <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full uppercase">
+                  Desconto de Administrador (99% OFF)
+                </span>
+              )}
+            </div>
             <div className="flex justify-between items-start">
               <div>
                 <h3 className="font-bold text-gray-900 text-xl">{plano.nome}</h3>
@@ -47,7 +58,10 @@ export default async function CheckoutPage({ params }: Props) {
                 </ul>
               </div>
               <div className="text-right">
-                <p className="text-3xl font-bold text-purple-600">{formatarMoeda(plano.precoMensal)}</p>
+                {isAdmin && (
+                  <p className="text-xs text-gray-400 line-through">{formatarMoeda(precoOriginal)}</p>
+                )}
+                <p className="text-3xl font-bold text-purple-600">{formatarMoeda(precoFinal)}</p>
                 <p className="text-sm text-gray-500">/mes</p>
               </div>
             </div>

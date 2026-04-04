@@ -30,12 +30,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Plano nao encontrado' }, { status: 404 })
     }
 
+    // Se for administrador, aplica 99% de desconto para fins de teste real no gateway
+    const isAdmin = session.user.role === 'ADMIN'
+    const valorFinal = isAdmin 
+      ? Number(plano.precoMensal) * 0.01 
+      : Number(plano.precoMensal)
+
     // Criar registro de pagamento pendente
     const pagamento = await prisma.pagamento.create({
       data: {
         userId: session.user.id,
         planoId,
-        valor: plano.precoMensal,
+        valor: valorFinal,
         gateway,
         status: 'PENDENTE',
       },
@@ -45,12 +51,12 @@ export async function POST(req: NextRequest) {
 
     if (gateway === 'MP') {
       redirectUrl = await criarPreferencia(
-        { nome: plano.nome, precoMensal: plano.precoMensal },
+        { nome: plano.nome, precoMensal: valorFinal },
         pagamento.id
       )
     } else if (gateway === 'STRIPE') {
       redirectUrl = await criarCheckoutSession(
-        { nome: plano.nome, precoMensal: plano.precoMensal },
+        { nome: plano.nome, precoMensal: valorFinal },
         pagamento.id
       )
     } else if (gateway === 'PAGSEGURO') {
@@ -58,7 +64,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'CPF e obrigatorio para PagSeguro' }, { status: 400 })
       }
       redirectUrl = await criarOrdemPagSeguro(
-        { nome: plano.nome, precoMensal: plano.precoMensal },
+        { nome: plano.nome, precoMensal: valorFinal },
         pagamento.id,
         cpf
       )

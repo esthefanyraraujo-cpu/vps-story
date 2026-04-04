@@ -11,6 +11,8 @@ async function getPlanos() {
 }
 
 export async function LandingPlanos() {
+  const session = await auth()
+  const isAdmin = session?.user?.role === 'ADMIN'
   const planos = await getPlanos()
 
   return (
@@ -23,7 +25,8 @@ export async function LandingPlanos() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {planos.map((plano, i) => {
-            const precoExibido = Number(plano.precoMensal)
+            const precoOriginal = Number(plano.precoMensal)
+            const precoExibido = isAdmin ? precoOriginal * 0.01 : precoOriginal
 
             return (
               <div
@@ -44,6 +47,16 @@ export async function LandingPlanos() {
                 <p className="text-gray-500 text-sm mb-6">{plano.descricao}</p>
 
                 <div className="mb-6">
+                  {isAdmin && (
+                    <div className="flex flex-col mb-1">
+                      <span className="text-xs text-gray-400 line-through">
+                        {formatarMoeda(precoOriginal)}
+                      </span>
+                      <span className="text-[10px] text-green-600 font-bold uppercase">
+                        Admin 99% OFF
+                      </span>
+                    </div>
+                  )}
                   <span className="text-4xl font-bold text-purple-600">{formatarMoeda(precoExibido)}</span>
                   <span className="text-gray-500 text-sm">/mes</span>
                 </div>

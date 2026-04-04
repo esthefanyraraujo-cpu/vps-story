@@ -22,12 +22,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Plano nao encontrado' }, { status: 404 })
     }
 
+    // Se for o próprio administrador pedindo, aplica o desconto de 99% no registro do banco
+    const valorFinal = session.user.id === userId 
+      ? Number(plano.precoMensal) * 0.01 
+      : plano.precoMensal
+
     // Criar um registro de pagamento aprovado manualmente
     const pagamento = await prisma.pagamento.create({
       data: {
         userId,
         planoId,
-        valor: plano.precoMensal,
+        valor: valorFinal,
         gateway: 'STRIPE', // Placeholder
         status: 'PENDENTE',
         transacaoId: `manual_admin_${Date.now()}`
