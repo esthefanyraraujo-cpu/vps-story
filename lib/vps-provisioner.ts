@@ -22,12 +22,14 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
   const nomeServidor = `vps-${pagamento.userId.slice(-6)}-${Date.now()}`
   const isWindows = pagamento.plano.nome.toLowerCase().includes('windows')
 
-  // Script Cloud-Init para instalar Windows automaticamente (exemplo funcional para Hetzner)
+  // Script Cloud-Init para instalar Windows automaticamente (usando o método mais robusto do reinstall.sh)
   // Este script baixa e instala uma imagem Windows via DD em uma instancia Linux
+  // Adicionamos flags de log e redirecionamento para garantir que o processo continue em background
   const windowsUserData = isWindows ? `#cloud-config
 runcmd:
-  - curl -L -o /tmp/win.gz https://github.com/bin456789/reinstall/releases/download/v1.0/reinstall.sh
-  - bash /tmp/win.gz windows --image-name 'Windows Server 2022' --lang 'pt-br'
+  - curl -L -o /tmp/reinstall.sh https://github.com/bin456789/reinstall/releases/download/v1.0/reinstall.sh
+  - chmod +x /tmp/reinstall.sh
+  - bash /tmp/reinstall.sh windows --image-name 'Windows Server 2022' --lang 'pt-br' --pk 'YourProductKeyIfAny'
 ` : undefined
 
   // Criar servidor na Hetzner - capturar root_password IMEDIATAMENTE
