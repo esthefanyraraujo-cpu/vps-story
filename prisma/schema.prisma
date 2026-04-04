@@ -7,6 +7,110 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id         String           @id @default(cuid())
+  nome       String
+  email      String           @unique
+  senha      String
+  role       Role             @default(CLIENT)
+  createdAt  DateTime         @default(now())
+  pagamentos Pagamento[]
+  mensagens  TicketMensagem[]
+  tickets    Ticket[]
+  vps        VPS[]
+
+  @@map("users")
+}
+
+model Plano {
+  id          String      @id @default(cuid())
+  nome        String
+  descricao   String?
+  ram         Int
+  cpu         Int
+  ssd         Int
+  banda       Int
+  precoMensal Decimal     @db.Decimal(10, 2)
+  hetznerTipo String
+  ativo       Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  pagamentos  Pagamento[]
+  vps         VPS[]
+
+  @@map("planos")
+}
+
+model VPS {
+  id                    String      @id @default(cuid())
+  userId                String
+  planoId               String
+  hetznerServerId       Int
+  nome                  String
+  ip                    String?
+  rootPasswordEncrypted String?
+  status                VPSStatus   @default(ATIVO)
+  dataExpiracao         DateTime
+  createdAt             DateTime    @default(now())
+  pagamentos            Pagamento[]
+  plano                 Plano       @relation(fields: [planoId], references: [id])
+  user                  User        @relation(fields: [userId], references: [id])
+
+  @@map("vps")
+}
+
+model Pagamento {
+  id          String          @id @default(cuid())
+  userId      String
+  vpsId       String?
+  planoId     String
+  valor       Decimal         @db.Decimal(10, 2)
+  gateway     Gateway
+  status      PagamentoStatus @default(PENDENTE)
+  transacaoId String?         @unique
+  createdAt   DateTime        @default(now())
+  plano       Plano           @relation(fields: [planoId], references: [id])
+  user        User            @relation(fields: [userId], references: [id])
+  vps         VPS?            @relation(fields: [vpsId], references: [id])
+
+  @@map("pagamentos")
+}
+
+model Ticket {
+  id         String           @id @default(cuid())
+  userId     String
+  titulo     String
+  status     TicketStatus     @default(ABERTO)
+  prioridade Prioridade       @default(MEDIA)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  mensagens  TicketMensagem[]
+  user       User             @relation(fields: [userId], references: [id])
+
+  @@map("tickets")
+}
+
+model TicketMensagem {
+  id        String   @id @default(cuid())
+  ticketId  String
+  autorId   String
+  mensagem  String
+  createdAt DateTime @default(now())
+  autor     User     @relation(fields: [autorId], references: [id])
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@map("ticket_mensagens")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("password_reset_tokens")
+}
+
 enum Role {
   CLIENT
   ADMIN
@@ -40,114 +144,4 @@ enum Prioridade {
   BAIXA
   MEDIA
   ALTA
-}
-
-model User {
-  id        String   @id @default(cuid())
-  nome      String
-  email     String   @unique
-  senha     String
-  role      Role     @default(CLIENT)
-  createdAt DateTime @default(now())
-
-  vps        VPS[]
-  pagamentos Pagamento[]
-  tickets    Ticket[]
-  mensagens  TicketMensagem[]
-
-  @@map("users")
-}
-
-model Plano {
-  id           String   @id @default(cuid())
-  nome         String
-  descricao    String?
-  ram          Int
-  cpu          Int
-  ssd          Int
-  banda        Int
-  precoMensal  Decimal  @db.Decimal(10, 2)
-  hetznerTipo  String
-  ativo        Boolean  @default(true)
-  createdAt    DateTime @default(now())
-
-  vps        VPS[]
-  pagamentos Pagamento[]
-
-  @@map("planos")
-}
-
-model VPS {
-  id                   String    @id @default(cuid())
-  userId               String
-  planoId              String
-  hetznerServerId      Int
-  nome                 String
-  ip                   String?
-  rootPasswordEncrypted String?
-  status               VPSStatus @default(ATIVO)
-  dataExpiracao        DateTime
-  createdAt            DateTime  @default(now())
-
-  user       User        @relation(fields: [userId], references: [id])
-  plano      Plano       @relation(fields: [planoId], references: [id])
-  pagamentos Pagamento[]
-
-  @@map("vps")
-}
-
-model Pagamento {
-  id           String          @id @default(cuid())
-  userId       String
-  vpsId        String?
-  planoId      String
-  valor        Decimal         @db.Decimal(10, 2)
-  gateway      Gateway
-  status       PagamentoStatus @default(PENDENTE)
-  transacaoId  String?         @unique
-  createdAt    DateTime        @default(now())
-
-  user  User   @relation(fields: [userId], references: [id])
-  vps   VPS?   @relation(fields: [vpsId], references: [id])
-  plano Plano  @relation(fields: [planoId], references: [id])
-
-  @@map("pagamentos")
-}
-
-model Ticket {
-  id        String       @id @default(cuid())
-  userId    String
-  titulo    String
-  status    TicketStatus @default(ABERTO)
-  prioridade Prioridade  @default(MEDIA)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-
-  user      User             @relation(fields: [userId], references: [id])
-  mensagens TicketMensagem[]
-
-  @@map("tickets")
-}
-
-model TicketMensagem {
-  id        String   @id @default(cuid())
-  ticketId  String
-  autorId   String
-  mensagem  String   @db.Text
-  createdAt DateTime @default(now())
-
-  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  autor  User   @relation(fields: [autorId], references: [id])
-
-  @@map("ticket_mensagens")
-}
-
-model PasswordResetToken {
-  id        String   @id @default(cuid())
-  email     String
-  token     String   @unique
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-
-  @@map("password_reset_tokens")
 }

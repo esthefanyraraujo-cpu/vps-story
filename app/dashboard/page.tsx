@@ -5,6 +5,8 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { CriarVPSManual } from '@/components/admin/criar-vps-manual'
 
+export const dynamic = 'force-dynamic'
+
 async function getDashboardData(userId: string) {
   const [vpsServers, pagamentos, tickets] = await Promise.all([
     prisma.vPS.findMany({

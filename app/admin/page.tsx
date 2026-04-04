@@ -2,6 +2,8 @@ import { prisma } from '@/lib/prisma'
 import { formatarMoeda } from '@/lib/utils'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 async function getMetricas() {
   const [totalClientes, totalVPS, vpsAtivos, ticketsAbertos, receitaMes] = await Promise.all([
     prisma.user.count({ where: { role: 'CLIENT' } }),
