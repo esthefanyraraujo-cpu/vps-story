@@ -34,6 +34,12 @@ export async function enviarCredenciaisVPS(
           <p><strong>Senha:</strong> <code style="background: #e5e7eb; padding: 2px 6px; border-radius: 4px;">${senha}</code></p>
         </div>
         ${isWindows ? `
+          <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <p style="color: #1e40af; margin: 0; font-weight: bold;">⚠️ IMPORTANTE: Tempo de Instalação</p>
+            <p style="color: #1e40af; margin: 5px 0 0 0; font-size: 14px;">
+              O Windows Server leva entre <strong>15 a 20 minutos</strong> para concluir a instalação automática. Se você tentar conectar agora e der erro, aguarde um pouco e tente novamente.
+            </p>
+          </div>
           <p><strong>Como conectar (Area de Trabalho Remota):</strong></p>
           <p>1. Abra o programa "Conexao de Area de Trabalho Remota" no seu Windows.</p>
           <p>2. Digite o IP: <strong>${ip}</strong></p>

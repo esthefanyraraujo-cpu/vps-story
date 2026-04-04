@@ -79,7 +79,22 @@ export default async function VPSDetailPage({ params }: Props) {
           {isWindows ? 'Acesso Area de Trabalho Remota (RDP)' : 'Acesso SSH'}
         </h2>
         {vps.ip ? (
-          <div className="space-y-3">
+          <div className="space-y-4">
+            {isWindows && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex gap-3">
+                <div className="bg-blue-500 text-white rounded-full p-1 h-fit">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-blue-900">Aguarde a Instalação do Windows</p>
+                  <p className="text-sm text-blue-700 mt-0.5">
+                    O Windows Server leva cerca de <strong>15 a 20 minutos</strong> para ser instalado e configurar o acesso remoto após a criação. Se a conexão falhar agora, tente novamente em alguns instantes.
+                  </p>
+                </div>
+              </div>
+            )}
             {isWindows ? (
               <>
                 <div className="bg-gray-100 p-4 rounded-lg">
