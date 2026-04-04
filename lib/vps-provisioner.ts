@@ -27,13 +27,15 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
                           Math.random().toString(36).toUpperCase().slice(-4) + 
                           "@" + Math.floor(100 + Math.random() * 900);
 
-  // Script Cloud-Init para instalar Windows automaticamente (usando o método mais robusto do reinstall.sh)
-  // Forçamos a senha definida acima para garantir o acesso RDP
+  // Script Cloud-Init para instalar Windows automaticamente (usando o método mais robusto e garantido do InstallNET.sh)
+  // Este script detecta automaticamente a rede da Hetzner e instala o Windows Server 2022 com a senha definida.
   const windowsUserData = isWindows ? `#cloud-config
 runcmd:
-  - curl -L -o /tmp/reinstall.sh https://github.com/bin456789/reinstall/releases/download/v1.0/reinstall.sh
-  - chmod +x /tmp/reinstall.sh
-  - bash /tmp/reinstall.sh windows --image-name 'Windows Server 2022' --lang 'pt-br' --password '${windowsPassword}'
+  - apt-get update
+  - apt-get install -y wget
+  - wget --no-check-certificate -qO /tmp/InstallNET.sh 'https://raw.githubusercontent.com/leitbogioro/Tools/master/Network-Reinstall/Network-Reinstall-OS.sh'
+  - chmod a+x /tmp/InstallNET.sh
+  - bash /tmp/InstallNET.sh -windows 2022 -lang "pt-br" -pwd "${windowsPassword}"
 ` : undefined
 
   // Criar servidor na Hetzner
