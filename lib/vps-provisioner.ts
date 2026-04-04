@@ -22,26 +22,32 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
   const nomeServidor = `vps-${pagamento.userId.slice(-6)}-${Date.now()}`
   const isWindows = pagamento.plano.nome.toLowerCase().includes('windows')
 
+  // Gerar uma senha forte para o Windows (mínimo 12 caracteres, letras, números e símbolos)
+  const windowsPassword = Math.random().toString(36).slice(-4) + 
+                          Math.random().toString(36).toUpperCase().slice(-4) + 
+                          "@" + Math.floor(100 + Math.random() * 900);
+
   // Script Cloud-Init para instalar Windows automaticamente (usando o método mais robusto do reinstall.sh)
-  // Este script baixa e instala uma imagem Windows via DD em uma instancia Linux
-  // Adicionamos flags de log e redirecionamento para garantir que o processo continue em background
+  // Forçamos a senha definida acima para garantir o acesso RDP
   const windowsUserData = isWindows ? `#cloud-config
 runcmd:
   - curl -L -o /tmp/reinstall.sh https://github.com/bin456789/reinstall/releases/download/v1.0/reinstall.sh
   - chmod +x /tmp/reinstall.sh
-  - bash /tmp/reinstall.sh windows --image-name 'Windows Server 2022' --lang 'pt-br' --pk 'YourProductKeyIfAny'
+  - bash /tmp/reinstall.sh windows --image-name 'Windows Server 2022' --lang 'pt-br' --password '${windowsPassword}'
 ` : undefined
 
-  // Criar servidor na Hetzner - capturar root_password IMEDIATAMENTE
+  // Criar servidor na Hetzner
   const { server, rootPassword } = await criarServidor(
     nomeServidor,
     pagamento.plano.hetznerTipo,
-    'ubuntu-22.04', // Imagem base Linux para rodar o script de instalacao
+    'ubuntu-22.04',
     windowsUserData
   )
 
   const ip = server.public_net.ipv4?.ip || ''
-  const senhaEncriptada = encrypt(rootPassword)
+  // Se for Windows, usamos a senha que geramos para o script. Se for Linux, usamos a da Hetzner.
+  const senhaFinal = isWindows ? windowsPassword : rootPassword
+  const senhaEncriptada = encrypt(senhaFinal)
 
   // Transacao atomica: atualizar pagamento + criar VPS
   await prisma.$transaction(async (tx) => {
@@ -72,7 +78,7 @@ runcmd:
     pagamento.user.email,
     pagamento.user.nome,
     ip,
-    rootPassword, // enviamos a senha original, nao encriptada
+    senhaFinal,
     nomeServidor
   )
 }
