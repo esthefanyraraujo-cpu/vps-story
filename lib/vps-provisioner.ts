@@ -22,33 +22,27 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
   const nomeServidor = `vps-${pagamento.userId.slice(-6)}-${Date.now()}`
   const isWindows = pagamento.plano.nome.toLowerCase().includes('windows')
 
-  // Gerar uma senha forte para o Windows (mínimo 12 caracteres, letras, números e símbolos)
-  const windowsPassword = Math.random().toString(36).slice(-4) + 
-                          Math.random().toString(36).toUpperCase().slice(-4) + 
-                          "@" + Math.floor(100 + Math.random() * 900);
+  // ID do Snapshot da Imagem Mestra Windows Server 2022 configurada manualmente
+  // Esta imagem ja possui drivers VirtIO, Rede ativa e RDP habilitado.
+  const WINDOWS_SNAPSHOT_ID = '373331653'
 
-  // Script Cloud-Init para instalar Windows automaticamente (usando o método mais robusto e garantido do InstallNET.sh)
-  // Este script detecta automaticamente a rede da Hetzner e instala o Windows Server 2022 com a senha definida.
-  const windowsUserData = isWindows ? `#cloud-config
-runcmd:
-  - apt-get update
-  - apt-get install -y wget
-  - wget --no-check-certificate -qO /tmp/InstallNET.sh 'https://raw.githubusercontent.com/leitbogioro/Tools/master/Network-Reinstall/Network-Reinstall-OS.sh'
-  - chmod a+x /tmp/InstallNET.sh
-  - bash /tmp/InstallNET.sh -windows 2022 -lang "pt-br" -pwd "${windowsPassword}"
-` : undefined
+  // Se for Windows, usamos o Snapshot para entrega instantanea. Se for Linux, usamos imagem base.
+  const imagemBase = isWindows ? WINDOWS_SNAPSHOT_ID : 'ubuntu-22.04'
 
   // Criar servidor na Hetzner
   const { server, rootPassword } = await criarServidor(
     nomeServidor,
     pagamento.plano.hetznerTipo,
-    'ubuntu-22.04',
-    windowsUserData
+    imagemBase,
+    undefined // Nao precisamos mais de userData/scripts para o Windows via Snapshot
   )
 
   const ip = server.public_net.ipv4?.ip || ''
-  // Se for Windows, usamos a senha que geramos para o script. Se for Linux, usamos a da Hetzner.
-  const senhaFinal = isWindows ? windowsPassword : rootPassword
+  
+  // No caso do Snapshot Windows, a senha ja e a que voce definiu na imagem mestra.
+  // Para Linux, continuamos usando a senha gerada pela Hetzner.
+  // IMPORTANTE: Voce deve informar aos clientes que a senha padrao do Windows e a que voce definiu.
+  const senhaFinal = isWindows ? 'A DEFINIDA NA IMAGEM' : rootPassword 
   const senhaEncriptada = encrypt(senhaFinal)
 
   // Transacao atomica: atualizar pagamento + criar VPS
