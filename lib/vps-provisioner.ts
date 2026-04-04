@@ -22,11 +22,23 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
   const nomeServidor = `vps-${pagamento.userId.slice(-6)}-${Date.now()}`
   const isWindows = pagamento.plano.nome.toLowerCase().includes('windows')
 
-  // ID do Snapshot da Imagem Mestra Windows Server 2022 configurada manualmente
-  // Esta imagem ja possui drivers VirtIO, Rede ativa e RDP habilitado.
+  // Gerar uma senha forte aleatoria para cada cliente
+  const novaSenhaAleatoria = Math.random().toString(36).slice(-4) + 
+                             Math.random().toString(36).toUpperCase().slice(-4) + 
+                             "@" + Math.floor(100 + Math.random() * 900);
+
+  // ID do Snapshot da Imagem Mestra
   const WINDOWS_SNAPSHOT_ID = '373331653'
 
-  // Se for Windows, usamos o Snapshot para entrega instantanea. Se for Linux, usamos imagem base.
+  // Script para trocar a senha do Windows no primeiro boot (Cloud-Init)
+  const windowsUserData = isWindows ? `#cloud-config
+password: ${novaSenhaAleatoria}
+chpasswd: { expire: False }
+ssh_pwauth: True
+runcmd:
+  - [ net, user, Administrator, "${novaSenhaAleatoria}" ]
+` : undefined
+
   const imagemBase = isWindows ? WINDOWS_SNAPSHOT_ID : 'ubuntu-22.04'
 
   // Criar servidor na Hetzner
@@ -34,15 +46,13 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
     nomeServidor,
     pagamento.plano.hetznerTipo,
     imagemBase,
-    undefined // Nao precisamos mais de userData/scripts para o Windows via Snapshot
+    windowsUserData // O Windows vai usar esse script para trocar a senha fixa pela aleatoria
   )
 
   const ip = server.public_net.ipv4?.ip || ''
   
-  // No caso do Snapshot Windows, a senha ja e a que voce definiu na imagem mestra.
-  // Para Linux, continuamos usando a senha gerada pela Hetzner.
-  // IMPORTANTE: Voce deve informar aos clientes que a senha padrao do Windows e a que voce definiu.
-  const senhaFinal = isWindows ? 'A DEFINIDA NA IMAGEM' : rootPassword 
+  // A senha final sera a aleatoria para Windows ou a da Hetzner para Linux
+  const senhaFinal = isWindows ? novaSenhaAleatoria : rootPassword 
   const senhaEncriptada = encrypt(senhaFinal)
 
   // Transacao atomica: atualizar pagamento + criar VPS
