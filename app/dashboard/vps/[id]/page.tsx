@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { formatarData, diasAteExpirar } from '@/lib/utils'
 import { notFound, redirect } from 'next/navigation'
 import { VPSActions } from '@/components/dashboard/vps-actions'
+import { decrypt } from '@/lib/crypto'
 
 interface Props {
   params: { id: string }
@@ -33,6 +34,7 @@ export default async function VPSDetailPage({ params }: Props) {
   }
 
   const isWindows = vps.plano.nome.toLowerCase().includes('windows')
+  const senha = vps.rootPasswordEncrypted ? decrypt(vps.rootPasswordEncrypted) : 'Nao definida'
 
   return (
     <div className="space-y-6">
@@ -105,13 +107,16 @@ export default async function VPSDetailPage({ params }: Props) {
                     Computador: <code className="bg-white px-1.5 py-0.5 rounded border">{vps.ip}</code>
                   </p>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <p className="text-sm text-gray-500">
-                    Usuario: <code className="bg-gray-100 px-1.5 py-0.5 rounded font-mono">Administrator</code>
-                  </p>
-                  <p className="text-sm text-gray-500 text-xs italic">
-                    * A senha foi enviada para o seu e-mail.
-                  </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="bg-gray-100 p-4 rounded-lg">
+                    <p className="text-xs text-gray-500 uppercase font-bold">Usuario</p>
+                    <code className="text-sm font-mono text-gray-900">Administrator</code>
+                  </div>
+                  <div className="bg-gray-100 p-4 rounded-lg relative group">
+                    <p className="text-xs text-gray-500 uppercase font-bold">Senha</p>
+                    <code className="text-sm font-mono text-gray-900">{senha}</code>
+                    <p className="text-[10px] text-gray-400 mt-1 italic">* Guarde esta senha em local seguro</p>
+                  </div>
                 </div>
               </>
             ) : (
@@ -119,9 +124,16 @@ export default async function VPSDetailPage({ params }: Props) {
                 <div className="bg-gray-900 text-green-400 rounded-lg p-4 font-mono text-sm">
                   ssh root@{vps.ip}
                 </div>
-                <p className="text-sm text-gray-500">
-                  Usuario: <code className="bg-gray-100 px-1.5 py-0.5 rounded">root</code>
-                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                  <div className="bg-gray-100 p-4 rounded-lg">
+                    <p className="text-xs text-gray-500 uppercase font-bold">Usuario</p>
+                    <code className="text-sm font-mono text-gray-900">root</code>
+                  </div>
+                  <div className="bg-gray-100 p-4 rounded-lg">
+                    <p className="text-xs text-gray-500 uppercase font-bold">Senha</p>
+                    <code className="text-sm font-mono text-gray-900">{senha}</code>
+                  </div>
+                </div>
               </>
             )}
           </div>
