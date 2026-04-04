@@ -36,6 +36,10 @@ export default async function VPSDetailPage({ params }: Props) {
   const isWindows = vps.plano.nome.toLowerCase().includes('windows')
   const senha = vps.rootPasswordEncrypted ? decrypt(vps.rootPasswordEncrypted) : 'Nao definida'
 
+  // O status ATIVO no banco significa que a VM ligou, mas o Windows pode ainda estar instalando.
+  // No futuro, podemos adicionar um check de porta real aqui.
+  const statusReal = vps.status === 'ATIVO' ? 'ATIVO' : vps.status
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
