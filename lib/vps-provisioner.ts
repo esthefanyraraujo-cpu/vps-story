@@ -32,7 +32,7 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
   const SNAPSHOTS_WINDOWS = {
     '40': '373331653',  // VPS Teste Admin (40GB)
     '80': '373919623',  // Windows Starter (80GB) - NOVO SNAPSHOT MESTRE
-    '160': '373331653', // Windows Pro (160GB)
+    '160': '373919887', // Windows Pro (160GB) - NOVO SNAPSHOT MESTRE
     '320': '373866889'  // Windows Ultra (320GB)
   }
 
