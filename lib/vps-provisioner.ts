@@ -27,8 +27,17 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
                              Math.random().toString(36).toUpperCase().slice(-4) + 
                              "@" + Math.floor(100 + Math.random() * 900);
 
-  // ID do Snapshot da Imagem Mestra
-  const WINDOWS_SNAPSHOT_ID = '373866889'
+  // IDs dos Snapshots conforme o tamanho do disco (Hetzner exige isso)
+  // O Snapshot 320 (seu novo ID) so funciona no plano Ultra de 320GB
+  const SNAPSHOTS_WINDOWS = {
+    '80': '373331653', // Snapshot antigo ou um novo de 80GB
+    '160': '373331653', // Snapshot de 160GB
+    '320': '373866889'  // Seu novo ID de 320GB
+  }
+
+  // Selecionar o ID correto conforme o SSD do plano
+  const ssdPlano = pagamento.plano.ssd.toString()
+  const WINDOWS_SNAPSHOT_ID = SNAPSHOTS_WINDOWS[ssdPlano as keyof typeof SNAPSHOTS_WINDOWS] || SNAPSHOTS_WINDOWS['80']
 
   // Script para trocar a senha do Windows no primeiro boot (Cloud-Init / Cloudbase-Init)
   // Usando formato PowerShell (#ps1_sysnative) que e mais nativo para Windows
