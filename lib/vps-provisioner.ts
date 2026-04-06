@@ -28,16 +28,17 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
                              "@" + Math.floor(100 + Math.random() * 900);
 
   // IDs dos Snapshots conforme o tamanho do disco (Hetzner exige isso)
+  // IMPORTANTE: O tamanho do snapshot DEVE ser menor ou igual ao disco do plano (cx33=80GB, cx43=160GB, etc)
   const SNAPSHOTS_WINDOWS = {
-    '40': '373919623',  // VPS Teste Admin (40GB) - USANDO O DE 80GB (Hetzner permite snapshot menor em disco maior, mas nao o contrario)
-    '80': '373919623',  // Windows Starter (80GB) - NOVO SNAPSHOT MESTRE
-    '160': '373919887', // Windows Pro (160GB) - NOVO SNAPSHOT MESTRE
-    '320': '373866889'  // Windows Ultra (320GB)
+    '40': '373919623',  // VPS Teste Admin (40GB) - ATENCAO: Se o snapshot for 80GB e o plano 40GB, vai falhar.
+    '80': '373919623',  // Windows Starter (80GB) - NOVO SNAPSHOT MESTRE (80GB)
+    '160': '373919887', // Windows Pro (160GB) - NOVO SNAPSHOT MESTRE (160GB)
+    '320': '373866889'  // Windows Ultra (320GB) - SNAPSHOT (320GB)
   }
 
   // Selecionar o ID correto conforme o SSD do plano
-  const ssdPlano = pagamento.plano.ssd.toString()
-  let WINDOWS_SNAPSHOT_ID = SNAPSHOTS_WINDOWS[ssdPlano as keyof typeof SNAPSHOTS_WINDOWS]
+  const ssdPlano = pagamento.plano.ssd
+  let WINDOWS_SNAPSHOT_ID = SNAPSHOTS_WINDOWS[ssdPlano.toString() as keyof typeof SNAPSHOTS_WINDOWS]
 
   // Se nao encontrar snapshot exato para o tamanho, tenta o de 80GB que e o mais compativel
   if (!WINDOWS_SNAPSHOT_ID) {
@@ -45,8 +46,11 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
     WINDOWS_SNAPSHOT_ID = SNAPSHOTS_WINDOWS['80']
   }
 
-  // Verificar se o snapshot escolhido nao e maior que o disco do plano
-  // ID 373331653 (antigo) precisava de 160GB, por isso removi do mapeamento de 40/80.
+  // Verificacao de seguranca: Hetzner nao permite snapshot maior que o disco
+  // Snapshot 373919623 tem 80GB. Se o plano for 40GB, vai dar erro.
+  if (isWindows && ssdPlano < 80 && WINDOWS_SNAPSHOT_ID === '373919623') {
+    throw new Error(`Erro: O plano ${pagamento.plano.nome} possui apenas ${ssdPlano}GB, mas o snapshot do Windows exige no minimo 80GB.`)
+  }
 
   // Script para trocar a senha do Windows no primeiro boot (Cloud-Init / Cloudbase-Init)
   // Usando formato PowerShell (#ps1_sysnative) que e mais nativo para Windows

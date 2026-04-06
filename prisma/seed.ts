@@ -95,10 +95,10 @@ async function main() {
       descricao: 'Plano exclusivo para testes do administrador',
       ram: 4,
       cpu: 2,
-      ssd: 40,
+      ssd: 80,
       banda: 20,
       precoMensal: 1.00,
-      hetznerTipo: 'cx23',
+      hetznerTipo: 'cx33',
       ativo: false, // Desativado por padrao para nao aparecer para clientes
     },
   ]
