@@ -6,5 +6,11 @@
     "app/api/checkout/**": {
       "maxDuration": 30
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/admin/vps/cron-limpeza",
+      "schedule": "0 3 * * *"
+    }
+  ]
 }

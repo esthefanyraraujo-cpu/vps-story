@@ -84,6 +84,22 @@ net user Administrator "${novaSenhaAleatoria}"
         vpsId: vps.id,
       },
     })
+
+    // Criar ticket de boas-vindas (Notificação no Painel)
+    await tx.ticket.create({
+      data: {
+        userId: pagamento.userId,
+        titulo: `Bem-vindo à sua nova VPS: ${nomeServidor}`,
+        prioridade: 'MEDIA',
+        status: 'RESPONDIDO',
+        mensagens: {
+          create: {
+            autorId: (await tx.user.findFirst({ where: { role: 'ADMIN' } }))?.id || pagamento.userId,
+            mensagem: `Olá ${pagamento.user.nome}! Sua VPS foi provisionada com sucesso.\n\nIP: ${ip}\nSenha: ${senhaFinal}\n\nJá enviamos esses dados para o seu e-mail também. Aproveite!`
+          }
+        }
+      }
+    })
   })
 
   // Enviar email com credenciais
