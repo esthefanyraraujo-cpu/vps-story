@@ -21,7 +21,7 @@ async function main() {
   console.log('Admin criado:', admin.email)
 
   // Criar planos Linux e Windows
-  const planos = [
+  const planos: any[] = [
     // Planos Linux
     {
       nome: 'Linux Starter',

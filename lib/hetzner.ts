@@ -31,6 +31,7 @@ export async function criarServidor(
     name: nome,
     server_type: tipo,
     image: imagem,
+    location: DEFAULT_LOCATION,
     start_after_create: true,
   }
   if (userData) {
