@@ -5,17 +5,24 @@ import { prisma } from '@/lib/prisma'
 import { addDays } from 'date-fns'
 
 export async function provisionarVPS(pagamentoId: string): Promise<void> {
+  try {
+    console.log(`[PROVISIONER] Iniciando provisionamento para Pagamento: ${pagamentoId}`)
   // Buscar pagamento
   const pagamento = await prisma.pagamento.findUnique({
     where: { id: pagamentoId },
     include: { user: true, plano: true },
   })
 
-  if (!pagamento) throw new Error(`Pagamento ${pagamentoId} nao encontrado`)
+  if (!pagamento) {
+    console.error(`[PROVISIONER] Erro: Pagamento ${pagamentoId} nao encontrado no banco`)
+    throw new Error(`Pagamento ${pagamentoId} nao encontrado`)
+  }
+
+  console.log(`[PROVISIONER] Plano: ${pagamento.plano.nome} | SSD: ${pagamento.plano.ssd}GB | Usuario: ${pagamento.user.email}`)
 
   // Idempotencia: ja processado
   if (pagamento.status === 'PAGO') {
-    console.log(`Pagamento ${pagamentoId} ja processado, ignorando`)
+    console.log(`[PROVISIONER] Pagamento ${pagamentoId} ja processado, ignorando`)
     return
   }
 
@@ -71,6 +78,8 @@ net user Administrator "${novaSenhaAleatoria}"
 
   const imagemBase = isWindows ? WINDOWS_SNAPSHOT_ID : 'ubuntu-22.04'
 
+  console.log(`[PROVISIONER] Criando servidor na Hetzner: ${nomeServidor} | Tipo: ${pagamento.plano.hetznerTipo} | Imagem: ${imagemBase}`)
+
   // Criar servidor na Hetzner
   const { server, rootPassword } = await criarServidor(
     nomeServidor,
@@ -78,6 +87,8 @@ net user Administrator "${novaSenhaAleatoria}"
     imagemBase,
     windowsUserData // O Windows vai usar esse script para trocar a senha fixa pela aleatoria
   )
+
+  console.log(`[PROVISIONER] Servidor criado na Hetzner com sucesso! ID: ${server.id} | IP: ${server.public_net.ipv4?.ip}`)
 
   const ip = server.public_net.ipv4?.ip || ''
   
@@ -126,11 +137,24 @@ net user Administrator "${novaSenhaAleatoria}"
   })
 
   // Enviar email com credenciais
-  await enviarCredenciaisVPS(
-    pagamento.user.email,
-    pagamento.user.nome,
-    ip,
-    senhaFinal,
-    nomeServidor
-  )
+    try {
+      await enviarCredenciaisVPS(
+        pagamento.user.email,
+        pagamento.user.nome,
+        ip,
+        senhaFinal,
+        nomeServidor
+      )
+    } catch (e) {
+      console.error(`[PROVISIONER_EMAIL_ERROR] Falha ao enviar email:`, e)
+      // Nao relanca o erro para nao travar o provisionamento que ja foi concluido no banco
+    }
+  } catch (error: any) {
+    console.error(`[PROVISIONER_FATAL_ERROR] Falha ao provisionar VPS para Pagamento ${pagamentoId}:`, error)
+    // Se o erro tiver resposta da Hetzner, loga ela tambem
+    if (error.message?.includes('Hetzner')) {
+      console.error(`[PROVISIONER_HETZNER_ERROR] Detalhes da API:`, error.message)
+    }
+    throw error
+  }
 }
