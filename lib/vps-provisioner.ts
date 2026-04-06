@@ -30,9 +30,10 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
   // IDs dos Snapshots conforme o tamanho do disco (Hetzner exige isso)
   // O Snapshot 320 (seu novo ID) so funciona no plano Ultra de 320GB
   const SNAPSHOTS_WINDOWS = {
-    '80': '373331653', // Snapshot antigo ou um novo de 80GB
-    '160': '373331653', // Snapshot de 160GB
-    '320': '373866889'  // Seu novo ID de 320GB
+    '40': '373331653',  // VPS Teste Admin (40GB)
+    '80': '373331653',  // Windows Starter (80GB)
+    '160': '373331653', // Windows Pro (160GB)
+    '320': '373866889'  // Windows Ultra (320GB)
   }
 
   // Selecionar o ID correto conforme o SSD do plano
