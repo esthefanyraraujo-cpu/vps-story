@@ -40,4 +40,7 @@ async function main() {
   console.log('Verifique a caixa de entrada (e o spam) do e-mail de destino.')
 }
 
-main()
+main().catch((e) => {
+  console.error('Erro fatal:', e)
+  process.exit(1)
+})

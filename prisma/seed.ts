@@ -104,8 +104,12 @@ async function main() {
   ]
 
   for (const plano of planos) {
-    const criado = await prisma.plano.create({ data: plano })
-    console.log('Plano criado:', criado.nome)
+    await prisma.plano.upsert({
+      where: { nome: plano.nome },
+      update: plano,
+      create: plano,
+    })
+    console.log('Plano processado:', plano.nome)
   }
 
   console.log('Seed concluido!')

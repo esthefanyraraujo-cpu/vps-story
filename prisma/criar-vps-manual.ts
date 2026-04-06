@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { provisionarVPS } from '../lib/vps-provisioner'
+import { provisionarVPS } from '@/lib/vps-provisioner'
 
 const prisma = new PrismaClient()
 
@@ -18,12 +18,12 @@ async function main() {
     return
   }
 
-  // 2. Buscar o plano VPS Gamer
+  // 2. Buscar o plano Linux Gamer
   const plano = await prisma.plano.findFirst({
-    where: { nome: 'VPS Gamer' }
+    where: { nome: 'Linux Gamer' }
   })
   if (!plano) {
-    console.error('Erro: Plano VPS Gamer nao encontrado no banco.')
+    console.error('Erro: Plano Linux Gamer nao encontrado no banco.')
     return
   }
 

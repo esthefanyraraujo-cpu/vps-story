@@ -14,6 +14,8 @@ export async function GET(req: NextRequest) {
 
     console.log('[CRON] Iniciando limpeza de VPS expiradas...')
 
+    const agora = new Date()
+
     // 1. VPS para SUSPENDER (Expirou hoje, mas ainda não deletamos)
     const paraSuspender = await prisma.vPS.findMany({
       where: {
@@ -23,7 +25,7 @@ export async function GET(req: NextRequest) {
     })
 
     // 2. VPS para DELETAR (Expirou há mais de 3 dias e já está suspensa)
-    const tresDiasAtras = new Date()
+    const tresDiasAtras = new Date(agora)
     tresDiasAtras.setDate(agora.getDate() - 3)
 
     const paraDeletar = await prisma.vPS.findMany({
