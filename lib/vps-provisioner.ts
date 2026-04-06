@@ -19,8 +19,10 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
     return
   }
 
+  const nomePlano = pagamento.plano.nome.toLowerCase()
+  const isWindows = nomePlano.includes('windows')
+  const ssdPlano = pagamento.plano.ssd
   const nomeServidor = `vps-${pagamento.userId.slice(-6)}-${Date.now()}`
-  const isWindows = pagamento.plano.nome.toLowerCase().includes('windows')
 
   // Gerar uma senha forte aleatoria para cada cliente
   const novaSenhaAleatoria = Math.random().toString(36).slice(-4) + 
@@ -28,28 +30,37 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
                              "@" + Math.floor(100 + Math.random() * 900);
 
   // IDs dos Snapshots conforme o tamanho do disco (Hetzner exige isso)
-  // IMPORTANTE: O tamanho do snapshot DEVE ser menor ou igual ao disco do plano (cx33=80GB, cx43=160GB, etc)
+  // O Snapshot 373919623 e de 80GB (Starter)
+  // O Snapshot 373919887 e de 160GB (Pro)
+  // O Snapshot 373866889 e de 320GB (Ultra)
   const SNAPSHOTS_WINDOWS = {
-    '40': '373919623',  // VPS Teste Admin (40GB) - ATENCAO: Se o snapshot for 80GB e o plano 40GB, vai falhar.
-    '80': '373919623',  // Windows Starter (80GB) - NOVO SNAPSHOT MESTRE (80GB)
-    '160': '373919887', // Windows Pro (160GB) - NOVO SNAPSHOT MESTRE (160GB)
-    '320': '373866889'  // Windows Ultra (320GB) - SNAPSHOT (320GB)
+    '80': '373919623',
+    '160': '373919887',
+    '320': '373866889'
   }
 
-  // Selecionar o ID correto conforme o SSD do plano
-  const ssdPlano = pagamento.plano.ssd
-  let WINDOWS_SNAPSHOT_ID = SNAPSHOTS_WINDOWS[ssdPlano.toString() as keyof typeof SNAPSHOTS_WINDOWS]
+  let WINDOWS_SNAPSHOT_ID = ''
 
-  // Se nao encontrar snapshot exato para o tamanho, tenta o de 80GB que e o mais compativel
+  // 1. Tentar mapear pelo nome do plano (Mais seguro)
+  if (nomePlano.includes('starter')) WINDOWS_SNAPSHOT_ID = SNAPSHOTS_WINDOWS['80']
+  else if (nomePlano.includes('pro')) WINDOWS_SNAPSHOT_ID = SNAPSHOTS_WINDOWS['160']
+  else if (nomePlano.includes('ultra') || nomePlano.includes('fivem')) WINDOWS_SNAPSHOT_ID = SNAPSHOTS_WINDOWS['320']
+  else if (nomePlano.includes('teste')) WINDOWS_SNAPSHOT_ID = SNAPSHOTS_WINDOWS['80']
+
+  // 2. Se nao encontrar pelo nome, tenta pelo SSD exato
   if (!WINDOWS_SNAPSHOT_ID) {
-    console.warn(`[PROVISIONER] Nenhum snapshot mapeado para SSD de ${ssdPlano}GB. Usando fallback de 80GB.`)
+    WINDOWS_SNAPSHOT_ID = SNAPSHOTS_WINDOWS[ssdPlano.toString() as keyof typeof SNAPSHOTS_WINDOWS]
+  }
+
+  // 3. Fallback final para 80GB se for Windows
+  if (isWindows && !WINDOWS_SNAPSHOT_ID) {
+    console.warn(`[PROVISIONER] Nao foi possivel mapear snapshot para o plano ${pagamento.plano.nome}. Usando fallback 80GB.`)
     WINDOWS_SNAPSHOT_ID = SNAPSHOTS_WINDOWS['80']
   }
 
-  // Verificacao de seguranca: Hetzner nao permite snapshot maior que o disco
-  // Snapshot 373919623 tem 80GB. Se o plano for 40GB, vai dar erro.
-  if (isWindows && ssdPlano < 80 && WINDOWS_SNAPSHOT_ID === '373919623') {
-    throw new Error(`Erro: O plano ${pagamento.plano.nome} possui apenas ${ssdPlano}GB, mas o snapshot do Windows exige no minimo 80GB.`)
+  // Verificacao de seguranca final
+  if (isWindows && ssdPlano < 80) {
+    throw new Error(`O plano ${pagamento.plano.nome} tem apenas ${ssdPlano}GB de SSD. O Windows exige no minimo 80GB (cx33).`)
   }
 
   // Script para trocar a senha do Windows no primeiro boot (Cloud-Init / Cloudbase-Init)
