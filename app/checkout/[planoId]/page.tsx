@@ -51,7 +51,7 @@ export default async function CheckoutPage({ params }: Props) {
                 <h3 className="font-bold text-gray-900 text-xl">{plano.nome}</h3>
                 <p className="text-gray-500 mt-1">{plano.descricao}</p>
                 <ul className="mt-3 space-y-1 text-sm text-gray-600">
-                  <li>{plano.ram >= 1024 ? `${plano.ram / 1024} GB` : `${plano.ram} MB`} RAM</li>
+                  <li>{plano.ram} GB RAM</li>
                   <li>{plano.cpu} vCPUs</li>
                   <li>{plano.ssd} GB SSD NVMe</li>
                   <li>{plano.banda} TB transferencia/mes</li>

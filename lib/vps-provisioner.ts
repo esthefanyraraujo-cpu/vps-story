@@ -28,7 +28,7 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
                              "@" + Math.floor(100 + Math.random() * 900);
 
   // ID do Snapshot da Imagem Mestra
-  const WINDOWS_SNAPSHOT_ID = '373331653'
+  const WINDOWS_SNAPSHOT_ID = '373866889'
 
   // Script para trocar a senha do Windows no primeiro boot (Cloud-Init / Cloudbase-Init)
   // Usando formato PowerShell (#ps1_sysnative) que e mais nativo para Windows

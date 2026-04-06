@@ -44,7 +44,7 @@ export default async function AdminPlanosPage() {
             </div>
 
             <ul className="space-y-1.5 text-sm text-gray-600 mb-4">
-              <li>{plano.ram >= 1024 ? `${plano.ram / 1024} GB` : `${plano.ram} MB`} RAM</li>
+              <li>{plano.ram} GB RAM</li>
               <li>{plano.cpu} vCPUs</li>
               <li>{plano.ssd} GB SSD NVMe</li>
               <li>{plano.banda} TB transferencia</li>

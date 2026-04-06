@@ -61,7 +61,7 @@ export default async function VPSDetailPage({ params }: Props) {
         <div className="bg-white rounded-xl border p-5">
           <p className="text-sm text-gray-500">RAM</p>
           <p className="text-lg font-semibold text-gray-900 mt-1">
-            {vps.plano.ram >= 1024 ? `${vps.plano.ram / 1024} GB` : `${vps.plano.ram} MB`}
+            {vps.plano.ram} GB
           </p>
         </div>
         <div className="bg-white rounded-xl border p-5">
