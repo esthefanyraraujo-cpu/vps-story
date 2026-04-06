@@ -31,7 +31,7 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
   // O Snapshot 320 (seu novo ID) so funciona no plano Ultra de 320GB
   const SNAPSHOTS_WINDOWS = {
     '40': '373331653',  // VPS Teste Admin (40GB)
-    '80': '373331653',  // Windows Starter (80GB)
+    '80': '373919623',  // Windows Starter (80GB) - NOVO SNAPSHOT MESTRE
     '160': '373331653', // Windows Pro (160GB)
     '320': '373866889'  // Windows Ultra (320GB)
   }
