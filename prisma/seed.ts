@@ -104,7 +104,7 @@ async function main() {
   ]
 
   for (const plano of planos) {
-    await prisma.plano.upsert({
+    await (prisma.plano as any).upsert({
       where: { nome: plano.nome },
       update: plano,
       create: plano,
@@ -117,10 +117,11 @@ async function main() {
 }
 
 main()
-  .catch((e) => {
-    console.error(e)
-    process.exit(1)
-  })
-  .finally(async () => {
+  .then(async () => {
     await prisma.$disconnect()
+  })
+  .catch(async (e) => {
+    console.error(e)
+    await prisma.$disconnect()
+    process.exit(1)
   })

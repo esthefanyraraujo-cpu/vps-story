@@ -28,9 +28,8 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
                              "@" + Math.floor(100 + Math.random() * 900);
 
   // IDs dos Snapshots conforme o tamanho do disco (Hetzner exige isso)
-  // O Snapshot 320 (seu novo ID) so funciona no plano Ultra de 320GB
   const SNAPSHOTS_WINDOWS = {
-    '40': '373331653',  // VPS Teste Admin (40GB)
+    '40': '373919623',  // VPS Teste Admin (40GB) - USANDO O DE 80GB (Hetzner permite snapshot menor em disco maior, mas nao o contrario)
     '80': '373919623',  // Windows Starter (80GB) - NOVO SNAPSHOT MESTRE
     '160': '373919887', // Windows Pro (160GB) - NOVO SNAPSHOT MESTRE
     '320': '373866889'  // Windows Ultra (320GB)
@@ -38,7 +37,16 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
 
   // Selecionar o ID correto conforme o SSD do plano
   const ssdPlano = pagamento.plano.ssd.toString()
-  const WINDOWS_SNAPSHOT_ID = SNAPSHOTS_WINDOWS[ssdPlano as keyof typeof SNAPSHOTS_WINDOWS] || SNAPSHOTS_WINDOWS['80']
+  let WINDOWS_SNAPSHOT_ID = SNAPSHOTS_WINDOWS[ssdPlano as keyof typeof SNAPSHOTS_WINDOWS]
+
+  // Se nao encontrar snapshot exato para o tamanho, tenta o de 80GB que e o mais compativel
+  if (!WINDOWS_SNAPSHOT_ID) {
+    console.warn(`[PROVISIONER] Nenhum snapshot mapeado para SSD de ${ssdPlano}GB. Usando fallback de 80GB.`)
+    WINDOWS_SNAPSHOT_ID = SNAPSHOTS_WINDOWS['80']
+  }
+
+  // Verificar se o snapshot escolhido nao e maior que o disco do plano
+  // ID 373331653 (antigo) precisava de 160GB, por isso removi do mapeamento de 40/80.
 
   // Script para trocar a senha do Windows no primeiro boot (Cloud-Init / Cloudbase-Init)
   // Usando formato PowerShell (#ps1_sysnative) que e mais nativo para Windows

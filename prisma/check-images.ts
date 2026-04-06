@@ -25,7 +25,13 @@ async function main() {
   console.log(`Encontrados ${images.length} Snapshots/Imagens na Hetzner.`)
 
   for (const img of images) {
-    console.log(`- [${img.id}] ${img.description} (${img.os_flavor}) - Status: ${img.status}`)
+    console.log(`ID: ${img.id}`)
+    console.log(`Descrição: ${img.description}`)
+    console.log(`Tamanho Mínimo: ${img.disk_size} GB`)
+    console.log(`Status: ${img.status}`)
+    console.log(`Criado em: ${img.created}`)
+    console.log(`Location: ${img.bound_to || 'Global'}`)
+    console.log('-----------------------------------')
   }
 }
 

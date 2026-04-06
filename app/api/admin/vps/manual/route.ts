@@ -43,8 +43,11 @@ export async function POST(req: NextRequest) {
     await provisionarVPS(pagamento.id)
 
     return NextResponse.json({ message: 'VPS criada com sucesso!' })
-  } catch (error) {
+  } catch (error: any) {
     console.error('[ADMIN_VPS_MANUAL]', error)
-    return NextResponse.json({ error: 'Erro ao criar VPS manualmente' }, { status: 500 })
+    return NextResponse.json({ 
+      error: 'Erro ao criar VPS manualmente',
+      message: error.message || String(error)
+    }, { status: 500 })
   }
 }

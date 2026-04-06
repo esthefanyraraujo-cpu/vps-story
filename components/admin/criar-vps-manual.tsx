@@ -39,15 +39,19 @@ export function CriarVPSManual({ userId, userName, planoId: defaultPlanoId, plan
       const res = await fetch('/api/admin/vps/manual', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, planoId }),
+        body: JSON.stringify({ userId, planoId: finalPlanoId }),
       })
 
-      if (!res.ok) throw new Error()
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Erro desconhecido')
+      }
 
       alert('Sucesso! A VPS está sendo provisionada.')
       setOpen(false)
-    } catch (error) {
-      alert('Erro ao criar VPS')
+    } catch (error: any) {
+      alert(`Erro ao criar VPS: ${error.message}`)
     } finally {
       setLoading(false)
     }
