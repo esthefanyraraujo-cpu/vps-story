@@ -96,7 +96,7 @@ export default async function VPSDetailPage({ params }: Props) {
                 <div>
                   <p className="text-sm font-semibold text-blue-900">Aguarde a Instalação do Windows</p>
                   <p className="text-sm text-blue-700 mt-0.5">
-                    O Windows Server leva cerca de <strong>15 a 20 minutos</strong> para ser instalado e configurar o acesso remoto após a criação. Se a conexão falhar agora, tente novamente em alguns instantes.
+                    O Windows Server leva cerca de <strong>2 a 5 minutos</strong> para ser instalado e configurar o acesso remoto após a criação. Se a conexão falhar agora, tente novamente em alguns instantes.
                   </p>
                 </div>
               </div>
