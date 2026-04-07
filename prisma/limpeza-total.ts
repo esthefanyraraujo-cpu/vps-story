@@ -17,7 +17,15 @@ async function main() {
   const deletePagamentos = await prisma.pagamento.deleteMany({})
   console.log(`${deletePagamentos.count} Pagamentos excluídos.`)
 
-  console.log('Banco de dados limpo! Painel e Receita zerados.')
+  // 4. Excluir todos os Tickets e Mensagens
+  await prisma.ticketMensagem.deleteMany({})
+  const deleteTickets = await prisma.ticket.deleteMany({})
+  console.log(`${deleteTickets.count} Tickets excluídos.`)
+
+  // 5. Excluir tokens de reset de senha
+  await prisma.passwordResetToken.deleteMany({})
+
+  console.log('Banco de dados limpo! Painel, Receita e Tickets zerados.')
 }
 
 main()

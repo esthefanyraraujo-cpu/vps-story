@@ -24,7 +24,9 @@ async function main() {
   console.log('Tipos disponiveis:')
   data.server_types.forEach((t: any) => {
     if (!t.deprecation) {
-      console.log(`- ${t.name} (ID: ${t.id})`)
+      const nbg1 = t.locations.find((l: any) => l.name === 'nbg1')
+      const availability = nbg1 ? (nbg1.available ? 'Disponivel' : 'ESGOTADO') : 'N/A'
+      console.log(`- ${t.name} (ID: ${t.id}) - RAM: ${t.memory}GB, Disk: ${t.disk}GB | nbg1: ${availability}`)
     }
   })
 }

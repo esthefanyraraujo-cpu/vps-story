@@ -46,7 +46,9 @@ export async function criarServidor(
 
   if (!res.ok) {
     const err = await res.json()
-    throw new Error(`Erro ao criar servidor Hetzner: ${JSON.stringify(err)}`)
+    const errorMsg = err?.error?.message || JSON.stringify(err)
+    console.error(`[HETZNER_API_ERROR] Status: ${res.status} | Erro: ${errorMsg}`)
+    throw new Error(`Hetzner: ${errorMsg}`)
   }
 
   const data = await res.json()

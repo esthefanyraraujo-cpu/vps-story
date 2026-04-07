@@ -42,7 +42,7 @@ async function main() {
       ssd: 80,
       banda: 20,
       precoMensal: 59.90,
-      hetznerTipo: 'cx33',
+      hetznerTipo: 'cpx22',
       ativo: true,
     },
     {
@@ -53,7 +53,7 @@ async function main() {
       ssd: 160,
       banda: 20,
       precoMensal: 99.90,
-      hetznerTipo: 'cx43',
+      hetznerTipo: 'cpx32',
       ativo: true,
     },
     // Planos Windows
@@ -65,7 +65,7 @@ async function main() {
       ssd: 80,
       banda: 20,
       precoMensal: 64.90,
-      hetznerTipo: 'cx33',
+      hetznerTipo: 'cpx22',
       ativo: true,
     },
     {
@@ -76,7 +76,7 @@ async function main() {
       ssd: 160,
       banda: 20,
       precoMensal: 94.90,
-      hetznerTipo: 'cx43',
+      hetznerTipo: 'cpx32',
       ativo: true,
     },
     {
@@ -87,7 +87,7 @@ async function main() {
       ssd: 320,
       banda: 20,
       precoMensal: 179.90,
-      hetznerTipo: 'cx53',
+      hetznerTipo: 'cpx42',
       ativo: true,
     },
     {
@@ -98,7 +98,7 @@ async function main() {
       ssd: 80,
       banda: 20,
       precoMensal: 1.00,
-      hetznerTipo: 'cx33',
+      hetznerTipo: 'cpx22',
       ativo: false, // Desativado por padrao para nao aparecer para clientes
     },
   ]

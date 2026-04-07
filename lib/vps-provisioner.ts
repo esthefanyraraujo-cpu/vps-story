@@ -54,20 +54,27 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
   else if (nomePlano.includes('ultra') || nomePlano.includes('fivem')) WINDOWS_SNAPSHOT_ID = SNAPSHOTS_WINDOWS['320']
   else if (nomePlano.includes('teste')) WINDOWS_SNAPSHOT_ID = SNAPSHOTS_WINDOWS['80']
 
-  // 2. Se nao encontrar pelo nome, tenta pelo SSD exato
+  // 2. Se nao encontrar pelo nome, tenta pelo SSD exato (Reforço)
   if (!WINDOWS_SNAPSHOT_ID) {
-    WINDOWS_SNAPSHOT_ID = SNAPSHOTS_WINDOWS[ssdPlano.toString() as keyof typeof SNAPSHOTS_WINDOWS]
+    const ssdStr = ssdPlano.toString()
+    WINDOWS_SNAPSHOT_ID = SNAPSHOTS_WINDOWS[ssdStr as keyof typeof SNAPSHOTS_WINDOWS]
+    console.log(`[PROVISIONER] Mapeamento por SSD: ${ssdStr}GB -> Snapshot: ${WINDOWS_SNAPSHOT_ID}`)
   }
 
-  // 3. Fallback final para 80GB se for Windows
+  // 3. Fallback final para 80GB se for Windows e ainda nao tiver ID
   if (isWindows && !WINDOWS_SNAPSHOT_ID) {
     console.warn(`[PROVISIONER] Nao foi possivel mapear snapshot para o plano ${pagamento.plano.nome}. Usando fallback 80GB.`)
     WINDOWS_SNAPSHOT_ID = SNAPSHOTS_WINDOWS['80']
   }
 
-  // Verificacao de seguranca final
-  if (isWindows && ssdPlano < 80) {
-    throw new Error(`O plano ${pagamento.plano.nome} tem apenas ${ssdPlano}GB de SSD. O Windows exige no minimo 80GB (cx33).`)
+  // Verificacao de seguranca final para Windows
+  if (isWindows) {
+    if (!WINDOWS_SNAPSHOT_ID) {
+      throw new Error(`Nao foi encontrado um Snapshot Windows compativel com o plano ${pagamento.plano.nome} (${ssdPlano}GB).`)
+    }
+    if (ssdPlano < 80) {
+      throw new Error(`O plano ${pagamento.plano.nome} tem apenas ${ssdPlano}GB de SSD. O Windows exige no minimo 80GB (cx33).`)
+    }
   }
 
   // Script para trocar a senha do Windows no primeiro boot (Cloud-Init / Cloudbase-Init)
