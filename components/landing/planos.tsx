@@ -13,7 +13,18 @@ async function getPlanos() {
 export async function LandingPlanos() {
   const session = await auth()
   const isAdmin = session?.user?.role === 'ADMIN'
-  const planos = await getPlanos()
+  const planosRaw = await getPlanos()
+
+  // Reordenar para colocar o Windows Starter no meio (index 1)
+  let planos = planosRaw
+  if (planosRaw.length >= 3) {
+    const popularIndex = planosRaw.findIndex(p => p.nome === 'Windows Starter')
+    if (popularIndex !== -1 && popularIndex !== 1) {
+      const item = planosRaw.splice(popularIndex, 1)[0]
+      planosRaw.splice(1, 0, item)
+      planos = [...planosRaw]
+    }
+  }
 
   return (
     <section id="planos" className="py-20 bg-gray-50 px-4">
@@ -24,18 +35,19 @@ export async function LandingPlanos() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {planos.map((plano, i) => {
+          {planos.map((plano) => {
             const precoOriginal = Number(plano.precoMensal)
             const precoExibido = isAdmin ? precoOriginal * 0.01 : precoOriginal
+            const isPopular = plano.nome === 'Windows Starter'
 
             return (
               <div
                 key={plano.id}
                 className={`bg-white rounded-2xl shadow-sm p-8 border-2 flex flex-col ${
-                  i === 1 ? 'border-purple-500 shadow-purple-100 shadow-lg' : 'border-transparent'
+                  isPopular ? 'border-purple-500 shadow-purple-100 shadow-lg' : 'border-transparent'
                 }`}
               >
-                {i === 1 && (
+                {isPopular && (
                   <div className="text-center mb-3">
                     <span className="bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                       MAIS POPULAR
@@ -87,7 +99,7 @@ export async function LandingPlanos() {
                 <Link
                   href={`/checkout/${plano.id}`}
                   className={`block text-center py-3 rounded-xl font-semibold transition-colors ${
-                    i === 1
+                    isPopular
                       ? 'bg-purple-600 hover:bg-purple-700 text-white'
                       : 'bg-gray-100 hover:bg-purple-600 hover:text-white text-gray-900'
                   }`}

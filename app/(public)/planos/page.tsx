@@ -12,7 +12,18 @@ async function getPlanos() {
 }
 
 export default async function PlanosPage() {
-  const planos = await getPlanos()
+  const planosRaw = await getPlanos()
+
+  // Reordenar para colocar o Windows Starter no meio (index 1) se houver pelo menos 3 planos
+  let planos = planosRaw
+  if (planosRaw.length >= 3) {
+    const popularIndex = planosRaw.findIndex(p => p.nome === 'Windows Starter')
+    if (popularIndex !== -1 && popularIndex !== 1) {
+      const item = planosRaw.splice(popularIndex, 1)[0]
+      planosRaw.splice(1, 0, item)
+      planos = [...planosRaw]
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-16">
@@ -25,69 +36,72 @@ export default async function PlanosPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {planos.map((plano, i) => (
-            <div
-              key={plano.id}
-              className={`bg-white rounded-2xl shadow-lg p-8 border-2 flex flex-col ${
-                i === 1 ? 'border-purple-500 scale-105' : 'border-transparent'
-              }`}
-            >
-              {i === 1 && (
-                <div className="text-center mb-4">
-                  <span className="bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                    MAIS POPULAR
-                  </span>
-                </div>
-              )}
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">{plano.nome}</h2>
-              <p className="text-gray-500 mb-6">{plano.descricao}</p>
-
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-purple-600">
-                  {formatarMoeda(plano.precoMensal)}
-                </span>
-                <span className="text-gray-500">/mes</span>
-              </div>
-
-              <ul className="space-y-3 mb-8 flex-1">
-                <li className="flex items-center gap-2 text-gray-700">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span>{plano.ram} GB RAM</span>
-                </li>
-                <li className="flex items-center gap-2 text-gray-700">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span>{plano.cpu} vCPUs</span>
-                </li>
-                <li className="flex items-center gap-2 text-gray-700">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span>{plano.ssd} GB SSD NVMe</span>
-                </li>
-                <li className="flex items-center gap-2 text-gray-700">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span>{plano.banda} TB Transferencia</span>
-                </li>
-                <li className="flex items-center gap-2 text-gray-700">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span>Suporte 24/7</span>
-                </li>
-                <li className="flex items-center gap-2 text-gray-700">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span>Painel de Controle</span>
-                </li>
-              </ul>
-
-              <Link
-                href={`/checkout/${plano.id}`}
-                className={`block text-center py-3 px-6 rounded-lg font-semibold transition-colors ${
-                  i === 1
-                    ? 'bg-purple-600 hover:bg-purple-700 text-white'
-                    : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+          {planos.map((plano) => {
+            const isPopular = plano.nome === 'Windows Starter'
+            return (
+              <div
+                key={plano.id}
+                className={`bg-white rounded-2xl shadow-lg p-8 border-2 flex flex-col ${
+                  isPopular ? 'border-purple-500 scale-105' : 'border-transparent'
                 }`}
               >
-                Contratar Agora
-              </Link>
-            </div>
-          ))}
+                {isPopular && (
+                  <div className="text-center mb-4">
+                    <span className="bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                      MAIS POPULAR
+                    </span>
+                  </div>
+                )}
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">{plano.nome}</h2>
+                <p className="text-gray-500 mb-6">{plano.descricao}</p>
+
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-purple-600">
+                    {formatarMoeda(plano.precoMensal)}
+                  </span>
+                  <span className="text-gray-500">/mes</span>
+                </div>
+
+                <ul className="space-y-3 mb-8 flex-1">
+                  <li className="flex items-center gap-2 text-gray-700">
+                    <span className="text-green-500 font-bold">✓</span>
+                    <span>{plano.ram} GB RAM</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-gray-700">
+                    <span className="text-green-500 font-bold">✓</span>
+                    <span>{plano.cpu} vCPUs</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-gray-700">
+                    <span className="text-green-500 font-bold">✓</span>
+                    <span>{plano.ssd} GB SSD NVMe</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-gray-700">
+                    <span className="text-green-500 font-bold">✓</span>
+                    <span>{plano.banda} TB Transferencia</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-gray-700">
+                    <span className="text-green-500 font-bold">✓</span>
+                    <span>Suporte 24/7</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-gray-700">
+                    <span className="text-green-500 font-bold">✓</span>
+                    <span>Painel de Controle</span>
+                  </li>
+                </ul>
+
+                <Link
+                  href={`/checkout/${plano.id}`}
+                  className={`block text-center py-3 px-6 rounded-lg font-semibold transition-colors ${
+                    isPopular
+                      ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+                  }`}
+                >
+                  Contratar Agora
+                </Link>
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>
