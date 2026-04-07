@@ -79,8 +79,10 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
 
   // Script para trocar a senha do Windows no primeiro boot (Cloud-Init / Cloudbase-Init)
   // Usando formato PowerShell (#ps1_sysnative) que e mais nativo para Windows
+  // Adicionado comando para forçar a expiração da senha e garantir que o Windows aceite a troca
   const windowsUserData = isWindows ? `#ps1_sysnative
-net user Administrator "${novaSenhaAleatoria}"
+net user Administrator "${novaSenhaAleatoria}" /expires:never /passwordchg:no
+wmic useraccount where name='Administrator' set passwordexpires=false
 ` : undefined
 
   const imagemBase = isWindows ? WINDOWS_SNAPSHOT_ID : 'ubuntu-22.04'
