@@ -36,13 +36,13 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
   const SENHA_FIXA_WINDOWS = "psstory@12345"
 
   // IDs dos Snapshots conforme o tamanho do disco (Hetzner exige isso)
-  // O Snapshot 374401663 e de 80GB (Starter)
-  // O Snapshot 374401592 e de 160GB (Pro)
-  // O Snapshot 374615340 e de 320GB (Ultra V2 - FiveM)
+  // O Snapshot 374659244 e de 80GB (Starter V2)
+  // O Snapshot 374663994 e de 160GB (Pro V2)
+  // O Snapshot 374629373 e de 320GB (Ultra V2 - FiveM)
   const SNAPSHOTS_WINDOWS = {
-    '80': '374401663',
-    '160': '374401592',
-    '320': '374615340'
+    '80': '374659244',
+    '160': '374663994',
+    '320': '374629373'
   }
 
   let WINDOWS_SNAPSHOT_ID = ''
