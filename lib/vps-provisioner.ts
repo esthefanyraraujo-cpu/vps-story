@@ -33,7 +33,7 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
 
   // Senha fixa padrao para Windows conforme solicitado pelo cliente
   // Para Linux, a Hetzner continuara gerando uma senha root aleatoria
-  const SENHA_FIXA_WINDOWS = "psstory@12345"
+  const SENHA_FIXA_WINDOWS = "Vpsstory@12345"
 
   // IDs dos Snapshots conforme o tamanho do disco (Hetzner exige isso)
   // O Snapshot 374659244 e de 80GB (Starter V2)
