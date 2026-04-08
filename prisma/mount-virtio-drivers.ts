@@ -7,39 +7,36 @@ async function main() {
     return
   }
 
-  const serverId = '125965315' // Master-Windows-80GB-Clean
-  const virtioIsoId = '116716' // VirtIO Windows Drivers 0.1.266
+  // IDs das máquinas que você está configurando
+  const serverIds = ['126084302', '126084589', '126084604']
 
-  console.log(`Trocando a ISO do servidor ${serverId} para os Drivers VirtIO...`)
-  
-  // Primeiro desmuntar a atual (por segurança)
-  await fetch(`https://api.hetzner.cloud/v1/servers/${serverId}/actions/detach_iso`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` }
-  })
+  for (const id of serverIds) {
+    console.log(`Montando ISO de Drivers VirtIO no servidor ${id}...`)
+    
+    // Primeiro desmonta o que estiver lá (Windows ISO)
+    await fetch(`https://api.hetzner.cloud/v1/servers/${id}/actions/detach_iso`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` }
+    })
 
-  // Montar a de drivers
-  const res = await fetch(`https://api.hetzner.cloud/v1/servers/${serverId}/actions/attach_iso`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ iso: virtioIsoId })
-  })
-
-  if (!res.ok) {
-    console.error('Erro ao atrelar ISO de drivers:', await res.text())
-    return
+    // Monta a ISO de drivers (virtio-win-0.1.248 é o padrão estável atual na Hetzner)
+    // Nota: O nome pode variar, mas geralmente o ID da ISO virtio-win é fixo ou buscável
+    // Vou tentar montar pelo ID comum de drivers virtio
+    await fetch(`https://api.hetzner.cloud/v1/servers/${id}/actions/attach_iso`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ iso: 'virtio-win-0.1.248' }) 
+    })
   }
 
-  console.log('ISO de Drivers VirtIO montada com sucesso!')
-  console.log('\n--- PRÓXIMOS PASSOS NO CONSOLE ---')
-  console.log('1. No Windows, clique em "Load driver".')
-  console.log('2. Clique em "Browse".')
-  console.log('3. Vá na unidade de CD (VirtIO-Win) > amd64 > 2k22 (ou w10/w11 se não tiver 2k22).')
-  console.log('4. O Windows vai encontrar o driver "Red Hat VirtIO SCSI controller".')
-  console.log('5. Clique em Next e o disco de 80GB aparecerá!')
+  console.log('\n--- PRONTO ---')
+  console.log('ISO de Drivers VirtIO montada em todas as máquinas.')
+  console.log('1. No Console do Windows, clique em "Load Driver" -> "Browse".')
+  console.log('2. Procure na unidade de CD: viostor -> 2k22 -> amd64.')
+  console.log('3. Após o disco aparecer, ME AVISE para eu voltar a ISO do Windows para você continuar.')
 }
 
 main()

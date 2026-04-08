@@ -16,9 +16,9 @@ async function main() {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      name: 'Master-Windows-80GB-Clean',
-      server_type: 'cx33', // 80GB SSD
-      image: 'ubuntu-22.04', // Hetzner exige uma imagem inicial, mas vamos sobrepor com ISO
+      name: 'Mestre-Windows-Novo-Nuremberg',
+      server_type: 'cpx22', // 80GB SSD Disponivel em Nuremberg
+      image: 'ubuntu-22.04', 
       location: 'nbg1',
       start_after_create: true,
       automount: false

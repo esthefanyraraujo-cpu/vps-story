@@ -25,7 +25,7 @@ async function main() {
     // Planos Linux
     {
       nome: 'Linux Starter',
-      descricao: 'Ideal para sites leves e aprendizado',
+      descricao: 'Ideal para sites leves, bots de Discord e aprendizado.',
       ram: 2,
       cpu: 2,
       ssd: 40,
@@ -36,7 +36,7 @@ async function main() {
     },
     {
       nome: 'Linux Pro',
-      descricao: 'Para aplicacoes em producao e empresas',
+      descricao: 'Para aplicacoes em producao, empresas e bancos de dados pequenos.',
       ram: 4,
       cpu: 2,
       ssd: 80,
@@ -47,7 +47,7 @@ async function main() {
     },
     {
       nome: 'Linux Gamer',
-      descricao: 'Servidores de jogos e alta performance',
+      descricao: 'Servidores de jogos e alta performance para multitarefas pesadas.',
       ram: 8,
       cpu: 4,
       ssd: 160,
@@ -59,7 +59,7 @@ async function main() {
     // Planos Windows
     {
       nome: 'Windows Starter',
-      descricao: 'Basico para desktop remoto Windows',
+      descricao: 'Desktop remoto basico para navegacao, estudos e bots leves.',
       ram: 4,
       cpu: 2,
       ssd: 80,
@@ -70,7 +70,7 @@ async function main() {
     },
     {
       nome: 'Windows Pro',
-      descricao: 'Ideal para aplicacoes e desktop fluido',
+      descricao: 'Multitarefa fluida para trabalho remoto e hospedar sistemas intermediarios.',
       ram: 8,
       cpu: 4,
       ssd: 160,
@@ -81,7 +81,7 @@ async function main() {
     },
     {
       nome: 'Windows Ultra (FiveM)',
-      descricao: 'Alta performance para FiveM e servidores pesados',
+      descricao: 'Alta performance focada em Servidores de FiveM e games pesados.',
       ram: 16,
       cpu: 8,
       ssd: 320,

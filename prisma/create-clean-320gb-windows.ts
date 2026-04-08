@@ -7,7 +7,7 @@ async function main() {
     return
   }
 
-  console.log('Criando NOVA VPS de 160GB (CX43) limpa com ISO do Windows Server 2022...')
+  console.log('Criando NOVA VPS de 320GB (CPX42) limpa com ISO do Windows Server 2022...')
   
   const res = await fetch('https://api.hetzner.cloud/v1/servers', {
     method: 'POST',
@@ -16,8 +16,8 @@ async function main() {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      name: 'Mestre-Windows-Novo-160GB',
-      server_type: 'cpx32', // 160GB SSD em Nuremberg
+      name: 'Mestre-Windows-Novo-320GB',
+      server_type: 'cpx42', // 320GB SSD em Nuremberg
       image: 'ubuntu-22.04', 
       location: 'nbg1',
       start_after_create: true,
@@ -33,7 +33,7 @@ async function main() {
   const data = await res.json()
   const serverId = data.server.id
 
-  console.log(`Servidor de 160GB criado com ID: ${serverId}`)
+  console.log(`Servidor de 320GB criado com ID: ${serverId}`)
 
   console.log('Atrelando ISO do Windows Server 2022 (8637)...')
   await fetch(`https://api.hetzner.cloud/v1/servers/${serverId}/actions/attach_iso`, {
@@ -55,7 +55,6 @@ async function main() {
   console.log(`ID da Máquina: ${serverId}`)
   console.log(`IP: ${data.server.public_net.ipv4.ip}`)
   console.log(`Acesse o console agora e instale o Windows Server 2022.`)
-  console.log(`\nIMPORTANTE: Lembre-se de instalar o Cloudbase-Init ao final para garantir a senha aleatória!`)
 }
 
 main()
