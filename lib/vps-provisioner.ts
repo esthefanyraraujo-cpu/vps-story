@@ -31,10 +31,9 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
   const ssdPlano = pagamento.plano.ssd
   const nomeServidor = `vps-${pagamento.userId.slice(-6)}-${Date.now()}`
 
-  // Gerar uma senha forte aleatoria para cada cliente
-  const novaSenhaAleatoria = Math.random().toString(36).slice(-4) + 
-                             Math.random().toString(36).toUpperCase().slice(-4) + 
-                             "@" + Math.floor(100 + Math.random() * 900);
+  // Senha fixa padrao para Windows conforme solicitado pelo cliente
+  // Para Linux, a Hetzner continuara gerando uma senha root aleatoria
+  const SENHA_FIXA_WINDOWS = "psstory@12345"
 
   // IDs dos Snapshots conforme o tamanho do disco (Hetzner exige isso)
   // O Snapshot 374401663 e de 80GB (Starter)
@@ -77,13 +76,8 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
     }
   }
 
-  // Script para trocar a senha do Windows no primeiro boot (Cloud-Init / Cloudbase-Init)
-  // Usando formato PowerShell (#ps1_sysnative) que e mais nativo para Windows
-  // Adicionado comando para forçar a expiração da senha e garantir que o Windows aceite a troca
-  const windowsUserData = isWindows ? `#ps1_sysnative
-net user Administrator "${novaSenhaAleatoria}" /expires:never /passwordchg:no
-wmic useraccount where name='Administrator' set passwordexpires=false
-` : undefined
+  // Nao enviamos UserData para Windows pois usaremos a senha fixa do snapshot
+  const windowsUserData = undefined
 
   const imagemBase = isWindows ? WINDOWS_SNAPSHOT_ID : 'ubuntu-22.04'
 
@@ -101,8 +95,8 @@ wmic useraccount where name='Administrator' set passwordexpires=false
 
   const ip = server.public_net.ipv4?.ip || ''
   
-  // A senha final sera a aleatoria para Windows ou a da Hetzner para Linux
-  const senhaFinal = isWindows ? novaSenhaAleatoria : rootPassword 
+  // A senha final sera a fixa para Windows ou a da Hetzner para Linux
+  const senhaFinal = isWindows ? SENHA_FIXA_WINDOWS : rootPassword 
   const senhaEncriptada = encrypt(senhaFinal)
 
   // Transacao atomica: atualizar pagamento + criar VPS
