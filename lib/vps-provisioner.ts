@@ -37,13 +37,13 @@ export async function provisionarVPS(pagamentoId: string): Promise<void> {
                              "@" + Math.floor(100 + Math.random() * 900);
 
   // IDs dos Snapshots conforme o tamanho do disco (Hetzner exige isso)
-  // O Snapshot 373919623 e de 80GB (Starter)
-  // O Snapshot 373919887 e de 160GB (Pro)
-  // O Snapshot 373866889 e de 320GB (Ultra)
+  // O Snapshot 374401663 e de 80GB (Starter)
+  // O Snapshot 374401592 e de 160GB (Pro)
+  // O Snapshot 374399786 e de 320GB (Ultra)
   const SNAPSHOTS_WINDOWS = {
-    '80': '373919623',
-    '160': '373919887',
-    '320': '373866889'
+    '80': '374401663',
+    '160': '374401592',
+    '320': '374399786'
   }
 
   let WINDOWS_SNAPSHOT_ID = ''
